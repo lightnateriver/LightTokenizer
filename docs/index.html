@@ -251,7 +251,7 @@ for qv in range(len(ca)):
 </table>
 <div class="c"><div class="t"><strong>关键关系链：</strong> 字符数 / 分块大小 = 分块数。分块数 × 重叠 = 总重叠字符。线程数决定同时处理几个块。线程池加速比上限 ~1.35x（GIL限制）。进程池不受 GIL 限制，加速比 ≈ 进程数 × 0.5-0.7（IPC开销制约）。</div></div>
 <h3>Qwen3.5 中文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小<span class="u"> (字符)</span></th><th>重叠<span class="u"> (字符)</span></th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
 <tbody>
 <tr><td>1K</td><td class="n">603</td><td class="n">1,346</td><td class="n">3</td><td class="n">512</td><td>16</td><td class="n">1</td><td class="n">1.0</td><td class="n">0.1</td><td class="n">1.1</td><td class="n">1.4</td><td class="n g">0.81x</td><td class="g">1.23x</td></tr>
 <tr><td>16K</td><td class="n">15,428</td><td class="n">33,546</td><td class="n">4</td><td class="n">8,384</td><td>32</td><td class="n">8</td><td class="n">23.6</td><td class="n">0.4</td><td class="n">24.0</td><td class="n">23.2</td><td class="n o">1.03x</td><td class="o">0.97x</td></tr>
@@ -264,7 +264,7 @@ for qv in range(len(ca)):
 </tbody></table>
 
 <h3>Qwen3.5 英文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小<span class="u"> (字符)</span></th><th>重叠<span class="u"> (字符)</span></th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
 <tbody>
 <tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">64</td><td class="n">13,864</td><td>32</td><td class="n">4</td><td class="n">305.0</td><td class="n">2.8</td><td class="n">307.8</td><td class="n">338.6</td><td class="n g">0.91x</td><td class="g">1.10x</td></tr>
 <tr><td>256K</td><td class="n">255,595</td><td class="n">1,778,495</td><td class="n">128</td><td class="n">13,894</td><td>32</td><td class="n">32</td><td class="n">622.4</td><td class="n">5.1</td><td class="n">627.4</td><td class="n">715.8</td><td class="n g">0.88x</td><td class="g">1.14x</td></tr>
@@ -274,7 +274,7 @@ for qv in range(len(ca)):
 </tbody></table>
 
 <h3>DSV4 Pro 中文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小<span class="u"> (字符)</span></th><th>重叠<span class="u"> (字符)</span></th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
 <tbody>
 <tr><td>128K</td><td class="n">127,264</td><td class="n">252,976</td><td class="n">64</td><td class="n">3,964</td><td>16</td><td class="n">8</td><td class="n">244.4</td><td class="n">2.0</td><td class="n">246.4</td><td class="n">278.8</td><td class="n g">0.88x</td><td class="g">1.14x</td></tr>
 <tr><td>256K</td><td class="n">254,784</td><td class="n">506,464</td><td class="n">64</td><td class="n">7,948</td><td>16</td><td class="n">8</td><td class="n">531.4</td><td class="n">4.5</td><td class="n">535.9</td><td class="n">599.5</td><td class="n g">0.89x</td><td class="g">1.13x</td></tr>
@@ -299,7 +299,7 @@ for qv in range(len(ca)):
 </table>
 <div class="c"><div class="t"><strong>进程池表额外列：</strong> 串行=单线程分词耗时(ms)。线程池=线程池模式LoPT耗时(ms)。线程加速=串行/线程池。进程数=并行工作进程数。进程池=进程池模式LoPT耗时(ms)。进程加速=串行/进程池。预热=首次创建池+加载分词器耗时(ms)。</div></div>
 	<h3>Qwen3.5 中文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小<span class="u"> (字符)</span></th><th>分块数</th><th>串行<span class="u"> (ms)</span></th><th>线程池<span class="u"> (ms)</span></th><th>线程加速</th><th>进程数</th><th>进程池<span class="u"> (ms)</span></th><th>进程加速</th><th>预热<span class="u"> (ms)</span></th></tr></thead>
 <tbody>
 <tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">2</td><td class="n g">137</td><td class="n o">1.48x</td><td class="n">30</td></tr>
 <tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">4</td><td class="n g">118</td><td class="n o">1.73x</td><td class="n">58</td></tr>
@@ -319,7 +319,7 @@ for qv in range(len(ca)):
 </tbody></table>
 
 <h3>Qwen3.5 英文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小<span class="u"> (字符)</span></th><th>分块数</th><th>串行<span class="u"> (ms)</span></th><th>线程池<span class="u"> (ms)</span></th><th>线程加速</th><th>进程数</th><th>进程池<span class="u"> (ms)</span></th><th>进程加速</th><th>预热<span class="u"> (ms)</span></th></tr></thead>
 <tbody>
 <tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">2</td><td class="n g">958</td><td class="n g">1.69x</td><td class="n">110</td></tr>
 <tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">4</td><td class="n g">530</td><td class="n g">3.05x</td><td class="n">132</td></tr>
@@ -334,7 +334,7 @@ for qv in range(len(ca)):
 </tbody></table>
 
 <h3>DSV4 Pro 英文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
+<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小<span class="u"> (字符)</span></th><th>分块数</th><th>串行<span class="u"> (ms)</span></th><th>线程池<span class="u"> (ms)</span></th><th>线程加速</th><th>进程数</th><th>进程池<span class="u"> (ms)</span></th><th>进程加速</th><th>预热<span class="u"> (ms)</span></th></tr></thead>
 <tbody>
 <tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">2</td><td class="n g">234</td><td class="n g">1.48x</td><td class="n">60</td></tr>
 <tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">4</td><td class="n g">211</td><td class="n g">1.64x</td><td class="n">62</td></tr>
