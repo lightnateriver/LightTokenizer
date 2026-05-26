@@ -12,14 +12,17 @@ ProcessPool(spawn) 模式在 ARM 单核上达到 **6-8× 加速**。
 
 ## 关键结果
 
-### ProcessPool(spawn, w=16) — 全量
+### ProcessPool(spawn, w=16) — 1024K 对比
 
 | Tokenizer | 语言 | 1024K 串行 | LoPT(ms) | **加速比** |
 |:--|:--|:--:|:--:|:--:|
 | Qwen3.5 (248K) | 中文 | 2045ms | 330ms | **6.20×** |
 | Qwen3.5 (248K) | 英文 | 3260ms | 396ms | **8.24×** |
-| DeepSeek-V4-Pro (128K) | 中文 | — | — | ~5.66× |
+| DeepSeek-V4-Pro (128K) | 中文 | 2574ms¹ | — | **~5.66×²** |
 | DeepSeek-V4-Pro (128K) | 英文 | 3157ms | 387ms | **8.16×** |
+
+¹ DSV4 Pro 中文 1024K 串行耗时来自 ThreadPool 穷举搜索基准（该数据点的 ProcessPool 未运行）。  
+² DSV4 Pro 中文 ProcessPool 实测仅 512K w=16 达 5.66×；1024K 未测试，从趋势估计相近。
 
 所有结果 **100% token 精确匹配**（逐位 == 验证）。
 
