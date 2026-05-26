@@ -71,7 +71,7 @@ LightTokenizer/
 ├── results/
 │   └── lopt_zh_results.md      # 中文穷举搜索数据（1700 组测试）
 ├── docs/
-│   ├── html/index.html         # HTML 分析报告
+│   ├── index.html              # HTML 分析报告
 │   ├── IMPLEMENTATION.md       # 算法实现细节 + 实验记录
 │   ├── SWEEP_GUIDE.md          # 换机重搜指南
 │   └── PITFALLS.md             # 已知陷阱
@@ -104,6 +104,6 @@ LightTokenizer/
 
 ## 链接
 
-- [HTML 报告](docs/html/index.html)
+- [HTML 报告](docs/index.html)
 - [论文 PDF](https://arxiv.org/abs/2511.04952)
 - [vLLM](https://github.com/vllm-project/vllm)
