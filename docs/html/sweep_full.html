@@ -1,394 +1,53 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LoPT 并行分词器 基准测试报告</title>
+<title>LoPT 完整压缩数据库</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--blue:#1f6feb;--blue2:#eaf2ff;--teal:#0f9f9a;--teal2:#e8f7f6;--orange:#f59e0b;--orange2:#fff4df;--red:#d64545;--green:#1a8a5a;--green2:#e6f7ee;--ink:#102033;--text:#1f2a44;--text2:#4a5a7a;--muted:#8a98aa;--line:#e2e8f0;--line2:#c8d6e5;--bg:#fff;--bg2:#f8fafc;--bg3:#f0f4f8;--radius:10px;--sans:'Inter','Noto Sans SC',sans-serif;--mono:'JetBrains Mono','SF Mono',monospace}
+<style>:root {
+  --blue: #1f6feb; --blue2: #eaf2ff; --teal: #0f9f9a; --teal2: #e8f7f6;
+  --orange: #f59e0b; --orange2: #fff4df; --red: #d64545; --red2: #fff0f0;
+  --green: #1a8a5a; --green2: #e6f7ee; --ink: #102033; --text: #1f2a44;
+  --text2: #4a5a7a; --muted: #8a98aa; --line: #e2e8f0; --line2: #c8d6e5;
+  --bg: #fff; --bg2: #f8fafc; --bg3: #f0f4f8; --radius: 10px;
+  --sans: 'Inter','Noto Sans SC',sans-serif; --mono: 'JetBrains Mono','SF Mono',monospace;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);color:var(--text);background:var(--bg);line-height:1.6}
-.hero{background:linear-gradient(135deg,#102033 0%,#1f6feb 55%,#0f9f9a 100%);color:#fff;padding:64px 40px 48px;position:relative;overflow:hidden}
-.hero::after{content:'';position:absolute;top:-40%;right:-20%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);pointer-events:none}
-.hero h1{font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-.03em;margin-bottom:4px;position:relative}
-.hero .sub{font-size:1.05rem;opacity:.8;font-weight:400;position:relative}
-.hero .tags{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
-.tag{display:inline-block;padding:4px 14px;border-radius:16px;font-size:.78rem;font-weight:500;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
-.tag.g{background:#1a8a5a;border:none}.tag.o{background:#f59e0b;border:none;color:#fff}.tag.t{background:#0f9f9a;border:none;color:#fff}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:-24px auto 0;max-width:1100px;padding:0 24px;position:relative;z-index:2}
-.mcard{background:#fff;border-radius:var(--radius);padding:18px 20px;box-shadow:0 2px 8px rgba(16,32,51,.06);border:1px solid var(--line)}
-.mcard .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.mcard .v{font-size:1.6rem;font-weight:800;color:var(--ink);line-height:1.2;margin-top:2px}
-.mcard .v.g{color:var(--green)}.mcard .v.b{color:var(--blue)}.mcard .v.o{color:var(--orange)}
-.mcard .d{font-size:.8rem;color:var(--text2);margin-top:2px}
-nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--line);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
-nav a{display:inline-block;padding:10px 14px;font-size:.82rem;font-weight:500;color:var(--text2);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap}
-nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}
-.ct{max-width:1100px;margin:0 auto;padding:32px 24px}
-.sec{margin-bottom:48px}
-.sec h2{font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:4px}
-.sec .lead{font-size:.9rem;color:var(--text2);margin-bottom:16px;line-height:1.5}
-.sec h3{font-size:1.05rem;font-weight:600;color:var(--blue);margin:20px 0 8px}
-.sec p{margin-bottom:10px;font-size:.9rem;color:var(--text)}
-.c{padding:14px 18px;border-radius:var(--radius);margin:14px 0;border-left:4px solid var(--blue);background:var(--blue2)}
-.c.w{border-left-color:var(--orange);background:var(--orange2)}
-.c.g{border-left-color:var(--green);background:var(--green2)}
-.c .t{font-size:.85rem;color:var(--text)}.c .t strong{color:var(--ink)}
-.fold{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:10px 0}
-.fold>summary{padding:10px 14px;background:var(--bg2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--ink)}
-.fold>summary:hover{background:var(--blue2)}
-.fold>.bd{padding:14px;border-top:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:8px 0 14px}
-thead th{background:var(--bg3);padding:7px 9px;text-align:left;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);border-bottom:2px solid var(--line2);white-space:nowrap}
-thead th .u{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:.68rem}
-tbody td{padding:6px 9px;border-bottom:1px solid var(--line)}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);line-height:1.6;padding:24px}
+h1{font-size:1.5rem;font-weight:800;color:var(--ink);margin-bottom:4px}
+.lead{font-size:.88rem;color:var(--text2);margin-bottom:16px;line-height:1.6}
+h2{font-size:1.15rem;font-weight:700;color:var(--ink);margin:20px 0 4px;padding-bottom:4px;border-bottom:2px solid var(--blue)}
+h3{font-size:.95rem;font-weight:600;color:var(--blue);margin:14px 0 4px}
+.d1{margin:6px 0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.d1>summary{padding:8px 14px;background:var(--bg2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--ink)}
+.d1>summary:hover{background:var(--blue2)}
+.d1>.bd{padding:10px 14px;border-top:1px solid var(--line)}
+.d2{margin:4px 0 4px 16px;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+.d2>summary{padding:6px 10px;background:var(--bg3);cursor:pointer;font-weight:500;font-size:.8rem;color:var(--text)}
+.d2>summary:hover{background:var(--blue2)}
+.d2>.bd{padding:8px 10px;border-top:1px solid var(--line)}
+.d3{margin:4px 0 4px 32px;border:1px solid #e8ecf0;border-radius:5px;overflow:hidden}
+.d3>summary{padding:5px 10px;background:#f8fafb;cursor:pointer;font-weight:500;font-size:.77rem;color:var(--text2)}
+.d3>summary:hover{background:var(--blue2)}
+.d3>.bd{padding:6px 10px;border-top:1px solid #e8ecf0}
+table{width:100%;border-collapse:collapse;font-size:.75rem;margin:4px 0}
+thead th{background:var(--bg3);padding:4px 6px;text-align:left;font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--text2);border-bottom:2px solid var(--line2);white-space:nowrap}
+thead th .u{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:.65rem}
+tbody td{padding:3px 6px;border-bottom:1px solid var(--line);font-size:.73rem}
 tbody tr:hover{background:var(--blue2)}
 td.n{text-align:right;font-variant-numeric:tabular-nums}
-td.g{color:var(--green);font-weight:600}td.b{color:var(--blue);font-weight:600}td.o{color:var(--orange);font-weight:600}td.r{color:var(--red);font-weight:600}
-.fc{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
-.fb{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-.fb .tt{padding:7px 12px;font-weight:600;font-size:.85rem}
-.fb.bf .tt{background:var(--red2);color:var(--red)}
-.fb.af .tt{background:var(--green2);color:var(--green)}
-.fb pre{font-family:var(--mono);font-size:.76rem;padding:10px 12px;background:var(--bg2);margin:0;overflow-x:auto;line-height:1.5}
-.tl{display:flex;height:28px;border-radius:5px;overflow:hidden;margin:8px 0}
-.tl .s{display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;color:#fff}
-.sr{background:var(--red)}.sb{background:var(--blue)}.sc{background:var(--teal)}.so{background:var(--orange)}.sg{background:var(--green)}
-.dtree{font-family:var(--mono);font-size:.82rem;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:14px;line-height:1.7;overflow-x:auto}
-@media(max-width:768px){.fc{grid-template-columns:1fr}.hero{padding:40px 20px 32px}.hero h1{font-size:24px}}
+td.g{color:var(--green);font-weight:600}td.o{color:var(--orange);font-weight:600}td.r{color:var(--red);font-weight:600}
 </style></head><body>
-<div class="hero"><h1>LoPT 并行分词器</h1>
-<div class="sub">ARM 单核 &middot; Qwen3.5 (248K) + DSV4 Pro (128K) &middot; 2000+ 组测试</div>
-<div class="tags"><span class="tag">进程池 8.24x</span><span class="tag t">线程池 1.35x</span>
-<span class="tag g">100% 精度</span><span class="tag o">ARM 单核验证</span><span class="tag">ca偏移修复</span></div></div>
-
-<div class="metrics">
-<div class="mcard"><div class="l">Tokenizers</div><div class="v b">2</div><div class="d">Qwen3.5 + DSV4 Pro</div></div>
-<div class="mcard"><div class="l">最高加速比</div><div class="v g">8.24x</div><div class="d">Qwen3.5 英文 1024K 进程池 w=16</div></div>
-<div class="mcard"><div class="l">测试数量</div><div class="v b">2,000+</div><div class="d">穷举搜索 + 进程池对比</div></div>
-<div class="mcard"><div class="l">精度</div><div class="v g">100%</div><div class="d">逐 token 精确匹配</div></div>
-<div class="mcard"><div class="l">完整数据</div><div class="v b">377KB</div><div class="d">内置可叠叠展开数据库</div></div>
+<h1>LoPT 完整原始数据库</h1>
+<div class="lead">
+按 Model → Language → Size → 分块大小(Lc) → 重叠大小(LO) x 线程数(t) 层层叠叠展开。<br>
+<strong>单位说明:</strong>
+Lc=分块大小(字符), LO=重叠大小(字符), t=线程/进程数, 
+Pool=并行阶段耗时(ms), Total=LoPT总耗时(ms), Ratio=Total/串行耗时(<1=加速)<br>
+<strong>颜色:</strong> 绿色=Ratio<1.0(加速), 黄色=1.0-1.3x, 红色=>1.3x
 </div>
-
-<nav><a href="#bg">背景</a><a href="#arch">架构</a><a href="#algo">算法</a><a href="#corpus">语料</a><a href="#tp">线程池</a><a href="#pp">进程池</a><a href="#full">完整数据</a><a href="#repro">复现</a></nav>
-
-<div class="ct">
-
-<div class="sec" id="bg"><h2>背景问题</h2>
-<div class="lead">vLLM 处理长文本时，HuggingFace 分词器是单线程 CPU 瓶颈。</div>
-<p>短文本(数百 token)时分词耗时可忽略，但输入达 100k+ 字符时，单线程分词耗时可达数秒。</p>
-
-<h3>vLLM 当前分词路径</h3>
-<div class="fb bf" style="margin:10px 0"><pre>HfRenderer._tokenize_prompt_async()
-  - get_async_tokenizer() -> AsyncMicrobatchTokenizer
-    - queue.put() -> _batch_encode_loop()
-      - ThreadPoolExecutor 中的单线程 HF 分词器
-        - 整个请求串行化，不跨块并行</pre></div>
-
-<h3>不同 GPU 下分词器占比 (1024K tokens)</h3>
-<table><thead><tr><th>GPU</th><th>预填充<span class="u"> (ms)</span></th><th>分词器<span class="u"> (ms)</span></th><th>TTFT<span class="u"> (ms)</span></th><th>分词器占比</th></tr></thead>
-<tbody>
-<tr><td>T4</td><td class="n">~2,500</td><td class="n">~2,500</td><td class="n">~5,000</td><td class="o">~50%</td></tr>
-<tr><td>A100</td><td class="n">~500</td><td class="n">~2,500</td><td class="n">~3,000</td><td class="r">~83%</td></tr>
-<tr><td>H100</td><td class="n">~200</td><td class="n">~2,500</td><td class="n">~2,700</td><td class="r">~93%</td></tr>
-</tbody></table>
-</div>
-
-<div class="sec" id="arch"><h2>架构对比</h2>
-<div class="lead">串行单线程 vs LoPT 进程池并行。英文 1024K (7M 字符) 为例。</div>
-<div class="fc">
-<div class="fb bf"><div class="tt">之前 &mdash; 串行 (3260ms)</div>
-<pre>文本 (7M 字符)
-    |
-    v
-[单线程分词器]
-    HF Tokenizer.encode()
-    ARM 单核 3260ms
-    |
-    v
-token 序列 (1,023,961)
-    |
-    v
-[开始 GPU 推理]</pre></div>
-<div class="fb af"><div class="tt">之后 &mdash; LoPT 进程池 w=16 (396ms)</div>
-<pre>文本 (7M 字符)
-    +-- 分为 17 个块 (每块 445304+64 字符)
-    |
-    v
-[进程池(spawn) x 16 工作进程]
-    每进程独立 GIL + Rust 分词器
-    墙钟 350ms
-    |
-    v
-重叠合并 (ca偏移修复) 36ms
-    |
-    v
-token 序列 (1,023,961) 精确匹配
-    |
-    v
-[开始 GPU 推理]</pre></div>
-</div>
-<p style="font-size:.85rem;font-weight:600;margin-bottom:2px">之前 &mdash; 串行 (3260ms)</p>
-<div class="tl"><div class="s sr" style="width:100%">分词: 3260ms</div></div>
-<p style="font-size:.85rem;font-weight:600;margin-top:10px;margin-bottom:2px">之后 &mdash; LoPT 进程池 w=16 (396ms)</p>
-<div class="tl"><div class="s so" style="width:3%">切分</div><div class="s sg" style="width:88%">并行分词: 350ms</div><div class="s sc" style="width:9%">合并: 36ms</div></div>
-</div>
-
-<div class="sec" id="algo"><h2>算法详解</h2>
-<div class="lead">分块 &rarr; 并行分词 &rarr; 重叠合并。核心突破在 ca-偏移修复。</div>
-
-<h3>算法流程</h3>
-<div class="fb af" style="margin:10px 0"><pre>输入文本 S (N 字符)
-|
-- 1. 按 Lc 拆分为块 (每块 Lc+LO 字符)
-|   Lc = 分块大小(字符), LO = 重叠大小(字符)
-|
-- 2. 并行分词
-|   - 块数 &le;10 &rarr; 线程池 (零 IPC)
-|   - 块数 &ge;20 &rarr; 进程池(spawn) (独立 GIL)
-|
-- 3. 用 offsets 在重叠区找 anchor
-|   同时比 token_id + 字符位置
-|   ca-偏移双重循环解决 BPE 边界问题
-|
-- 4. 按 anchor 位置确定每块贡献段
-|
-- 5. 拼接为完整 token 序列</pre></div>
-
-<h3>ca-偏移修复</h3>
-<div class="c"><div class="t"><strong>项目启发自</strong> LoPT 论文 (Huawei, <a href="https://arxiv.org/abs/2511.04952" style="color:var(--blue)">arXiv:2511.04952</a>)：通过重叠切分+并行分词+anchor合并实现无损并行分词。本文在此基础上发现了大词表 tokenizer 的 BPE 边界偏移问题并独立解决。</div></div>
-<div class="c r"><div class="t"><strong>问题：</strong> 原始算法只比 <code>pa[pv+k] == ca[k]</code>，ca 始终从索引 0 开始。BPE 在块边界偏移 1-2 token -> 整段序列错位 -> 全部匹配失败 -> 回退串行。</div></div>
-<div class="c"><div class="t"><strong>ca-偏移修复是本文原创发现，不在 LoPT 论文中。</strong> 论文假设 BPE 在重叠区内总能稳定对齐（ca[0] 即匹配起点）。但大词表 tokenizer（Qwen3.5 248K、DSV4 Pro 128K）在块边界处不稳定：chunk_{i+1} 无左侧上下文时会多分 1-2 个 token，整段偏移。此修复是本项目独立发现并从"全部 fallback"到"稳定 2x+"的关键突破。</div></div>
-
-<div class="fb bf" style="margin:10px 0"><pre>
-修复前 &mdash; ca[0] 对齐失效:
-
-chunk_i overlap (有上下文):   offsets=[(169,175), (175,178), (178,182), (182,185), (185,188)]
-                                         pa[0]      pa[1]      pa[2]      pa[3]      pa[4]
-
-chunk_{i+1} overlap (无上下文): offsets=[(170,171), (171,175), (175,178), (178,182), (182,185)]
-                                         ca[0]      ca[1]      ca[2]      ca[3]      ca[4]
-
-   pa[0]=(169,175)  vs  ca[0]=(170,171)  &rarr; &#x2716; 不匹配
-   pa[1]=(175,178)  vs  ca[1]=(171,175)  &rarr; &#x2716; 不匹配
-   pa[2]=(178,182)  vs  ca[2]=(175,178)  &rarr; &#x2716; 不匹配
-   全部失败 &rarr; fallback &rarr; 1.3-1.4x 更慢
-
-原因此 chunk_{i+1} 从字符 170 开始，BPE 将 "b" 和 "egan" 分为两个 token，
-而 chunk_i 中有上文，" began" 被合为一个 token (169,175)，导致整段偏移。</pre></div>
-
-<div class="fb af" style="margin:10px 0"><pre>
-修复后 &mdash; ca 偏移匹配（尝试所有 pv, qv 起始对）:
-
-chunk_i overlap:   offsets=[(169,175), (175,178), (178,182), (182,185), (185,188)]
-                                  pa[0]      pa[1]      pa[2]      pa[3]      pa[4]
-                                              &uarr; pa[1]=(175,178)
-
-chunk_{i+1} overlap: offsets=[(170,171), (171,175), (175,178), (178,182), (182,185)]
-                                  ca[0]      ca[1]      ca[2]      ca[3]      ca[4]
-                                                       &uarr; ca[2]=(175,178) = pa[1]
-
-   pa[1]=(175,178) == ca[2]=(175,178)  &rarr; &#x2714; 匹配成功！
-   继续: pa[2]=(178,182) == ca[3]=(178,182)  &rarr; &#x2714;
-   继续: pa[3]=(182,185) == ca[4]=(182,185)  &rarr; &#x2714;
-   anchor = (pa_start=1, ca_start=2, length=3)  &rarr; 正确合并 &rarr; 0.47-0.55x 加速</pre></div>
-
-<div class="fc">
-<div class="fb bf"><div class="tt">修复前 &mdash; 全部回退</div><pre>只对齐 ca[0]
-while k < mk and pa[pv+k] == ca[k]:
-    k += 1
-&rarr; 偏移 1 token 就找不到
-&rarr; 回退到串行
-&rarr; 1.3-1.4x 更慢</pre></div>
-<div class="fb af"><div class="tt">修复后 &mdash; 稳定 2x+</div><pre>尝试 ca 偏移
-for qv in range(len(ca)):
-    while k < mk and pa[pv+k] == ca[qv+k]:
-        k += 1
-&rarr; 找到偏移后的匹配
-&rarr; 正确合并
-&rarr; 0.47-0.55x 加速</pre></div>
-</div>
-
-<h3>修复前后对比 (DSV4 Pro, 英文, LO=256)</h3>
-<table><thead><tr><th>规模</th><th>修复前<span class="u"> (ms)</span></th><th>比串行</th><th>修复后<span class="u"> (ms)</span></th><th>比串行</th><th>改善</th></tr></thead>
-<tbody>
-<tr><td>64K</td><td class="n">234</td><td class="n r">1.36x</td><td class="n">93</td><td class="n g">0.55x</td><td class="g">2.5x 更快</td></tr>
-<tr><td>128K</td><td class="n">477</td><td class="n r">1.36x</td><td class="n">186</td><td class="n g">0.54x</td><td class="g">2.6x 更快</td></tr>
-<tr><td>256K</td><td class="n">996</td><td class="n r">1.37x</td><td class="n">363</td><td class="n g">0.50x</td><td class="g">2.7x 更快</td></tr>
-<tr><td>512K</td><td class="n">1,981</td><td class="n r">1.30x</td><td class="n">716</td><td class="n g">0.47x</td><td class="g">2.8x 更快</td></tr>
-</tbody></table>
-</div>
-
-<div class="sec" id="corpus"><h2>语料构造 + 中英文差异</h2>
-<div class="lead">测试数据的构造方式和中英文性能差异的根本原因。</div>
-
-<p><strong>中文：</strong>20 段独立新闻短文(~80字/段)，涵盖 12 个主题。重复拼接到目标字符数。</p>
-<p><strong>英文：</strong>20 段独立英文新闻短文(~60词/段)。英文 chars/token 比约 4:1，远高于中文 1:1。</p>
-
-<table><thead><tr><th>因素</th><th>中文</th><th>英文</th><th>影响</th></tr></thead>
-<tbody>
-<tr><td>字符/token 比</td><td class="n">~1:1</td><td class="n">~4:1</td><td>英文每 token 处理 4x 字符，并行收益更大</td></tr>
-<tr><td>每 token 串行耗时</td><td class="n">~2.1us</td><td class="n">~3.2us</td><td>英文分词器更慢(更多合并规则)</td></tr>
-<tr><td>同 token 下字符数</td><td class="n">少</td><td class="n">多</td><td>英文块数更多 &rarr; 并行度更高</td></tr>
-<tr><td>重叠大小</td><td class="n">16 字符</td><td class="n">32-64 字符</td><td>英文需要更大重叠</td></tr>
-<tr><td>线程池加速</td><td class="n">~1.35x</td><td class="n">~1.29x</td><td>中文线程池略好(合并开销小)</td></tr>
-<tr><td>进程池加速</td><td class="n">~6.2x</td><td class="n">~8.2x</td><td>英文明显更快(块多/字符多)</td></tr>
-</tbody></table>
-</div>
-<div class="sec" id="tp"><h2>线程池穷举搜索</h2>
-<div class="lead">8 规模 &times; 5-9 分块大小 &times; 5-9 重叠大小 &times; 6 线程数 = ~2000+ 组测试。全部结果 100% 精确匹配。</div>
-<table style="font-size:.82rem;margin:8px 0 14px">
-<thead><tr><th>列</th><th>符号</th><th>含义</th><th>关系</th></tr></thead>
-<tbody>
-<tr><td><strong>规模</strong></td><td>size</td><td>目标标记量标签</td><td>128K ≈ 128,000 tokens，实际值微调</td></tr>
-<tr><td><strong>Token数</strong></td><td>n_tok</td><td>分词后实际 token 数量</td><td>由 HF 分词器确定，与字符数和语言相关</td></tr>
-<tr><td><strong>字符数</strong></td><td>n_chars</td><td>输入文本字符总数</td><td>英文 4字符≈1 token，中文 1字符≈1 token</td></tr>
-<tr><td><strong>分块数</strong></td><td>n_chunks</td><td>文本被切成的块数</td><td>ceil(字符数 / 分块大小)</td></tr>
-<tr><td><strong>分块大小</strong></td><td>Lc</td><td>每个块包含的字符数</td><td>越大 → 块越少 → 并行度越低；最优≈字符数/128</td></tr>
-<tr><td><strong>重叠</strong></td><td>LO</td><td>相邻块重叠字符数</td><td>越大 → BPE越稳定 → merge开销越大 O(LO<sup>2</sup>)</td></tr>
-<tr><td><strong>线程/进程</strong></td><td>t/w</td><td>并行工作线程/进程数</td><td>单核 t=2 饱和，进程池 w=16 最优</td></tr>
-</tbody>
-</table>
-<div class="c"><div class="t"><strong>关键关系链：</strong> 字符数 / 分块大小 = 分块数。分块数 × 重叠 = 总重叠字符。线程数决定同时处理几个块。线程池加速比上限 ~1.35x（GIL限制）。进程池不受 GIL 限制，加速比 ≈ 进程数 × 0.5-0.7（IPC开销制约）。</div></div>
-<h3>Qwen3.5 中文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
-<tbody>
-<tr><td>1K</td><td class="n">603</td><td class="n">1,346</td><td class="n">3</td><td class="n">512</td><td>16</td><td class="n">1</td><td class="n">1.0</td><td class="n">0.1</td><td class="n">1.1</td><td class="n">1.4</td><td class="n g">0.81x</td><td class="g">1.23x</td></tr>
-<tr><td>16K</td><td class="n">15,428</td><td class="n">33,546</td><td class="n">4</td><td class="n">8,384</td><td>32</td><td class="n">8</td><td class="n">23.6</td><td class="n">0.4</td><td class="n">24.0</td><td class="n">23.2</td><td class="n o">1.03x</td><td class="o">0.97x</td></tr>
-<tr><td>64K</td><td class="n">63,461</td><td class="n">137,874</td><td class="n">16</td><td class="n">8,616</td><td>16</td><td class="n">16</td><td class="n">95.7</td><td class="n">1.1</td><td class="n">96.8</td><td class="n">94.6</td><td class="n o">1.02x</td><td class="o">0.98x</td></tr>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">32</td><td class="n">8,652</td><td>16</td><td class="n">2</td><td class="n">191.3</td><td class="n">2.3</td><td class="n">193.5</td><td class="n">214.1</td><td class="n g">0.90x</td><td class="g">1.11x</td></tr>
-<tr><td>256K</td><td class="n">255,593</td><td class="n">555,186</td><td class="n">64</td><td class="n">8,674</td><td>16</td><td class="n">2</td><td class="n">381.6</td><td class="n">4.7</td><td class="n">386.3</td><td class="n">450.9</td><td class="n g">0.86x</td><td class="g">1.17x</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">128</td><td class="n">8,684</td><td>16</td><td class="n">2</td><td class="n">768.9</td><td class="n">9.1</td><td class="n">778.0</td><td class="n">993.1</td><td class="n g">0.78x</td><td class="g">1.28x</td></tr>
-<tr><td>860K</td><td class="n">859,860</td><td class="n">1,867,658</td><td class="n">228</td><td class="n">8,192</td><td>16</td><td class="n">2</td><td class="n">1301.6</td><td class="n">15.6</td><td class="n">1317.2</td><td class="n">1697.6</td><td class="n g">0.78x</td><td class="g">1.29x</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">128</td><td class="n">17,368</td><td>16</td><td class="n">2</td><td class="n">1545.2</td><td class="n">14.9</td><td class="n">1560.1</td><td class="n">2101.4</td><td class="n g">0.74x</td><td class="g">1.35x</td></tr>
-</tbody></table>
-
-<h3>Qwen3.5 英文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
-<tbody>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">64</td><td class="n">13,864</td><td>32</td><td class="n">4</td><td class="n">305.0</td><td class="n">2.8</td><td class="n">307.8</td><td class="n">338.6</td><td class="n g">0.91x</td><td class="g">1.10x</td></tr>
-<tr><td>256K</td><td class="n">255,595</td><td class="n">1,778,495</td><td class="n">128</td><td class="n">13,894</td><td>32</td><td class="n">32</td><td class="n">622.4</td><td class="n">5.1</td><td class="n">627.4</td><td class="n">715.8</td><td class="n g">0.88x</td><td class="g">1.14x</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">128</td><td class="n">27,817</td><td>64</td><td class="n">8</td><td class="n">1277.2</td><td class="n">11.4</td><td class="n">1288.6</td><td class="n">1516.7</td><td class="n g">0.85x</td><td class="g">1.18x</td></tr>
-<tr><td>860K</td><td class="n">859,537</td><td class="n">5,980,877</td><td class="n">128</td><td class="n">46,725</td><td>32</td><td class="n">4</td><td class="n">2234.2</td><td class="n">12.2</td><td class="n">2246.4</td><td class="n">2725.0</td><td class="n g">0.82x</td><td class="g">1.21x</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">128</td><td class="n">55,663</td><td>32</td><td class="n">8</td><td class="n">2608.8</td><td class="n">13.0</td><td class="n">2621.8</td><td class="n">3378.5</td><td class="n g">0.78x</td><td class="g">1.29x</td></tr>
-</tbody></table>
-
-<h3>DSV4 Pro 中文 &mdash; 最优配置</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块数</th><th>分块大小</th><th>重叠</th><th>线程</th><th>并行阶段<span class="u"> (ms)</span></th><th>合并阶段<span class="u"> (ms)</span></th><th>总耗时<span class="u"> (ms)</span></th><th>串行耗时<span class="u"> (ms)</span></th><th>比串行</th><th>加速比</th></tr></thead>
-<tbody>
-<tr><td>128K</td><td class="n">127,264</td><td class="n">252,976</td><td class="n">64</td><td class="n">3,964</td><td>16</td><td class="n">8</td><td class="n">244.4</td><td class="n">2.0</td><td class="n">246.4</td><td class="n">278.8</td><td class="n g">0.88x</td><td class="g">1.14x</td></tr>
-<tr><td>256K</td><td class="n">254,784</td><td class="n">506,464</td><td class="n">64</td><td class="n">7,948</td><td>16</td><td class="n">8</td><td class="n">531.4</td><td class="n">4.5</td><td class="n">535.9</td><td class="n">599.5</td><td class="n g">0.89x</td><td class="g">1.13x</td></tr>
-<tr><td>512K</td><td class="n">509,824</td><td class="n">1,013,456</td><td class="n">128</td><td class="n">7,949</td><td>16</td><td class="n">8</td><td class="n">969.9</td><td class="n">8.5</td><td class="n">978.4</td><td class="n">1231.2</td><td class="n g">0.79x</td><td class="g">1.27x</td></tr>
-<tr><td>1024K</td><td class="n">1,019,136</td><td class="n">2,025,808</td><td class="n">248</td><td class="n">8,192</td><td>16</td><td class="n">32</td><td class="n">2061.6</td><td class="n">14.0</td><td class="n">2075.6</td><td class="n">2574.4</td><td class="n g">0.81x</td><td class="g">1.25x</td></tr>
-</tbody></table>
-
-</div>
-<div class="sec" id="pp"><h2>进程池(spawn)对比</h2>
-<div class="lead">进程池(spawn)模式。每进程数独立创建池，含预热，3次中位值。全部结果逐 token 精确匹配。仅测128K/512K/1024K三个规模（小规模chunk数过少，IPC开销无法摊薄，无加速意义）。</div>
-<table style="font-size:.82rem;margin:8px 0 14px">
-<thead><tr><th>列</th><th>符号</th><th>含义</th><th>关系</th></tr></thead>
-<tbody>
-<tr><td><strong>规模</strong></td><td>size</td><td>目标标记量标签</td><td>128K ≈ 128,000 tokens，实际值微调</td></tr>
-<tr><td><strong>Token数</strong></td><td>n_tok</td><td>分词后实际 token 数量</td><td>由 HF 分词器确定，与字符数和语言相关</td></tr>
-<tr><td><strong>字符数</strong></td><td>n_chars</td><td>输入文本字符总数</td><td>英文 4字符≈1 token，中文 1字符≈1 token</td></tr>
-<tr><td><strong>分块数</strong></td><td>n_chunks</td><td>文本被切成的块数</td><td>ceil(字符数 / 分块大小)</td></tr>
-<tr><td><strong>分块大小</strong></td><td>Lc</td><td>每个块包含的字符数</td><td>越大 → 块越少 → 并行度越低；最优≈字符数/128</td></tr>
-<tr><td><strong>重叠</strong></td><td>LO</td><td>相邻块重叠字符数</td><td>越大 → BPE越稳定 → merge开销越大 O(LO<sup>2</sup>)</td></tr>
-<tr><td><strong>线程/进程</strong></td><td>t/w</td><td>并行工作线程/进程数</td><td>单核 t=2 饱和，进程池 w=16 最优</td></tr>
-</tbody>
-</table>
-<div class="c"><div class="t"><strong>进程池表额外列：</strong> 串行=单线程分词耗时(ms)。线程池=线程池模式LoPT耗时(ms)。线程加速=串行/线程池。进程数=并行工作进程数。进程池=进程池模式LoPT耗时(ms)。进程加速=串行/进程池。预热=首次创建池+加载分词器耗时(ms)。</div></div>
-	<h3>Qwen3.5 中文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
-<tbody>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">2</td><td class="n g">137</td><td class="n o">1.48x</td><td class="n">30</td></tr>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">4</td><td class="n g">118</td><td class="n o">1.73x</td><td class="n">58</td></tr>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">8</td><td class="n g">124</td><td class="n o">1.65x</td><td class="n">62</td></tr>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">16</td><td class="n g">127</td><td class="n o">1.61x</td><td class="n">183</td></tr>
-<tr><td>128K</td><td class="n">127,505</td><td class="n">276,978</td><td class="n">65,536</td><td class="n">17</td><td class="n">204</td><td class="n">200</td><td class="n o">1.02x</td><td class="n">32</td><td class="n g">64</td><td class="n g">3.21x</td><td class="n">109</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">65,536</td><td class="n">17</td><td class="n">1,001</td><td class="n">838</td><td class="n o">1.19x</td><td class="n">2</td><td class="n g">574</td><td class="n o">1.74x</td><td class="n">69</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">65,536</td><td class="n">17</td><td class="n">1,001</td><td class="n">838</td><td class="n o">1.19x</td><td class="n">4</td><td class="n g">307</td><td class="n g">3.26x</td><td class="n">133</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">65,536</td><td class="n">17</td><td class="n">1,001</td><td class="n">838</td><td class="n o">1.19x</td><td class="n">8</td><td class="n g">187</td><td class="n g">5.35x</td><td class="n">273</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">65,536</td><td class="n">17</td><td class="n">1,001</td><td class="n">838</td><td class="n o">1.19x</td><td class="n">16</td><td class="n g">225</td><td class="n g">4.45x</td><td class="n">244</td></tr>
-<tr><td>512K</td><td class="n">511,769</td><td class="n">1,111,602</td><td class="n">65,536</td><td class="n">17</td><td class="n">1,001</td><td class="n">838</td><td class="n o">1.19x</td><td class="n">32</td><td class="n g">190</td><td class="n g">5.27x</td><td class="n">384</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">131,072</td><td>17</td><td class="n">2,045</td><td class="n">1,799</td><td class="n o">1.14x</td><td>2</td><td class="n g">1,215</td><td class="n g">1.68x</td><td class="n">158</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">131,072</td><td>17</td><td class="n">2,045</td><td class="n">1,799</td><td class="n o">1.14x</td><td>4</td><td class="n g">686</td><td class="n g">2.98x</td><td class="n">223</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">131,072</td><td>17</td><td class="n">2,045</td><td class="n">1,799</td><td class="n o">1.14x</td><td>8</td><td class="n g">443</td><td class="n g">4.62x</td><td class="n">415</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">131,072</td><td>17</td><td class="n">2,045</td><td class="n">1,799</td><td class="n o">1.14x</td><td>16</td><td class="n g">330</td><td class="n g">6.20x</td><td class="n">495</td></tr>
-<tr><td>1024K</td><td class="n">1,023,528</td><td class="n">2,223,146</td><td class="n">131,072</td><td>17</td><td class="n">2,045</td><td class="n">1,799</td><td class="n o">1.14x</td><td>32</td><td class="n g">359</td><td class="n g">5.69x</td><td class="n">568</td></tr>
-</tbody></table>
-
-<h3>Qwen3.5 英文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
-<tbody>
-<tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">2</td><td class="n g">958</td><td class="n g">1.69x</td><td class="n">110</td></tr>
-<tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">4</td><td class="n g">530</td><td class="n g">3.05x</td><td class="n">132</td></tr>
-<tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">8</td><td class="n g">275</td><td class="n g">5.88x</td><td class="n">222</td></tr>
-<tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">16</td><td class="n g">217</td><td class="n g">7.45x</td><td class="n">280</td></tr>
-<tr><td>512K</td><td class="n">510,833</td><td class="n">3,527,712</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,615</td><td class="n">1,397</td><td class="n o">1.16x</td><td class="n">32</td><td class="n g">263</td><td class="n g">6.14x</td><td class="n">510</td></tr>
-<tr><td>1024K</td><td class="n">1,021,655</td><td class="n">7,055,366</td><td class="n">445,304</td><td>17</td><td class="n">3,260</td><td class="n">2,894</td><td class="n o">1.13x</td><td>2</td><td class="n g">1,867</td><td class="n g">1.75x</td><td class="n">219</td></tr>
-<tr><td>1024K</td><td class="n">1,021,655</td><td class="n">7,055,366</td><td class="n">445,304</td><td>17</td><td class="n">3,260</td><td class="n">2,894</td><td class="n o">1.13x</td><td>4</td><td class="n g">962</td><td class="n g">3.39x</td><td class="n">252</td></tr>
-<tr><td>1024K</td><td class="n">1,021,655</td><td class="n">7,055,366</td><td class="n">445,304</td><td>17</td><td class="n">3,260</td><td class="n">2,894</td><td class="n o">1.13x</td><td>8</td><td class="n g">557</td><td class="n g">5.86x</td><td class="n">313</td></tr>
-<tr><td>1024K</td><td class="n">1,021,655</td><td class="n">7,055,366</td><td class="n">445,304</td><td>17</td><td class="n">3,260</td><td class="n">2,894</td><td class="n o">1.13x</td><td>16</td><td class="n g">396</td><td class="n g">8.24x</td><td class="n">584</td></tr>
-<tr><td>1024K</td><td class="n">1,021,655</td><td class="n">7,055,366</td><td class="n">445,304</td><td>17</td><td class="n">3,260</td><td class="n">2,894</td><td class="n o">1.13x</td><td>32</td><td class="n g">508</td><td class="n g">6.42x</td><td class="n">550</td></tr>
-</tbody></table>
-
-<h3>DSV4 Pro 英文</h3>
-<table><thead><tr><th>规模</th><th>Token数</th><th>字符数</th><th>分块大小</th><th>分块数</th><th>串行</th><th>线程池</th><th>线程加速</th><th>进程数</th><th>进程池</th><th>进程加速</th><th>预热</th></tr></thead>
-<tbody>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">2</td><td class="n g">234</td><td class="n g">1.48x</td><td class="n">60</td></tr>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">4</td><td class="n g">211</td><td class="n g">1.64x</td><td class="n">62</td></tr>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">8</td><td class="n o">307</td><td class="n o">1.13x</td><td class="n">250</td></tr>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">16</td><td class="n g">128</td><td class="n g">2.72x</td><td class="n">153</td></tr>
-<tr><td>128K</td><td class="n">127,534</td><td class="n">887,414</td><td class="n">65,536</td><td class="n">14</td><td class="n">347</td><td class="n">349</td><td class="n o">0.99x</td><td class="n">32</td><td class="n r">427</td><td class="n r">0.81x</td><td class="n">425</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,551</td><td class="n">1,344</td><td class="n o">1.15x</td><td class="n">2</td><td class="n g">877</td><td class="n g">1.77x</td><td class="n">104</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,551</td><td class="n">1,344</td><td class="n o">1.15x</td><td class="n">4</td><td class="n g">452</td><td class="n g">3.43x</td><td class="n">119</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,551</td><td class="n">1,344</td><td class="n o">1.15x</td><td class="n">8</td><td class="n g">444</td><td class="n g">3.50x</td><td class="n">253</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,551</td><td class="n">1,344</td><td class="n o">1.15x</td><td class="n">16</td><td class="n g">189</td><td class="n g">8.21x</td><td class="n">203</td></tr>
-<tr><td>512K</td><td class="n">511,717</td><td class="n">3,560,657</td><td class="n">222,536</td><td class="n">17</td><td class="n">1,551</td><td class="n">1,344</td><td class="n o">1.15x</td><td class="n">32</td><td class="n g">224</td><td class="n g">6.93x</td><td class="n">329</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">445,304</td><td>17</td><td class="n">3,157</td><td class="n">2,790</td><td class="n o">1.13x</td><td>2</td><td class="n g">1,875</td><td class="n g">1.68x</td><td class="n">211</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">445,304</td><td>17</td><td class="n">3,157</td><td class="n">2,790</td><td class="n o">1.13x</td><td>4</td><td class="n g">913</td><td class="n g">3.46x</td><td class="n">236</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">445,304</td><td>17</td><td class="n">3,157</td><td class="n">2,790</td><td class="n o">1.13x</td><td>8</td><td class="n g">554</td><td class="n g">5.70x</td><td class="n">359</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">445,304</td><td>17</td><td class="n">3,157</td><td class="n">2,790</td><td class="n o">1.13x</td><td>16</td><td class="n g">387</td><td class="n g">8.16x</td><td class="n">562</td></tr>
-<tr><td>1024K</td><td class="n">1,023,961</td><td class="n">7,124,981</td><td class="n">445,304</td><td>17</td><td class="n">3,157</td><td class="n">2,790</td><td class="n o">1.13x</td><td>32</td><td class="n g">404</td><td class="n g">7.81x</td><td class="n">580</td></tr>
-</tbody></table>
-
-</div>
-<div class="sec" id="select"><h2>自动选择指南</h2>
-<div class="lead">select_pool(块数) 根据分块数自动选择最佳池类型。</div>
-<div class="dtree">
-块数 &le; 10  &rarr; 线程池 (零 IPC 开销)。理由: 块少时池创建+IPC开销无法摊薄
-
-10 < 块数 < 20 &rarr; 两者都可 (实测线程池略好)。理由: 边界区域，差距 <5%
-
-块数 &ge; 20 &rarr; 进程池(spawn)。理由: 独立 GIL 优势显著。最佳进程数 = min(16, 块数)
-</div>
-
-<table><thead><tr><th>场景</th><th>池类型</th><th>工作进程数</th><th>分块大小</th><th>重叠大小</th><th>加速比</th></tr></thead>
-<tbody>
-<tr><td>中文 <64K 字符</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td class="o">无收益</td></tr>
-<tr><td>中文 64K-256K</td><td>线程池</td><td>2-4</td><td>字符数/128</td><td>16</td><td class="b">1.1-1.2x</td></tr>
-<tr><td>中文 256K-1024K</td><td>进程池</td><td>16</td><td>字符数/128</td><td>16</td><td class="g">>4x</td></tr>
-<tr><td>英文 <128K 字符</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td class="o">无收益</td></tr>
-<tr><td>英文 128K-512K</td><td>进程池</td><td>16</td><td>字符数/128</td><td>32-64</td><td class="g">2-6x</td></tr>
-<tr><td>英文 512K-1024K+</td><td>进程池</td><td>16</td><td>字符数/128</td><td>32-64</td><td class="g">6-8x</td></tr>
-</tbody></table>
-</div>
-<div class="sec" id="full"><h2>完整原始数据库</h2>
-<div class="lead">按 模型 &rarr; 语言 &rarr; 规模 &rarr; 分块大小(Lc) &rarr; 重叠(LO) x 线程(t) 层层叠叠展开。单元格: 并行阶段(ms)/总耗时(ms)/比串行。绿色=&lt;1(加速)，黄色=1-1.3x，红色=&gt;1.3x</div>
-<table style="font-size:.82rem;margin:8px 0 14px">
-<thead><tr><th>列</th><th>符号</th><th>含义</th><th>关系</th></tr></thead>
-<tbody>
-<tr><td><strong>规模</strong></td><td>size</td><td>目标标记量标签</td><td>128K ≈ 128,000 tokens，实际值微调</td></tr>
-<tr><td><strong>Token数</strong></td><td>n_tok</td><td>分词后实际 token 数量</td><td>由 HF 分词器确定，与字符数和语言相关</td></tr>
-<tr><td><strong>字符数</strong></td><td>n_chars</td><td>输入文本字符总数</td><td>英文 4字符≈1 token，中文 1字符≈1 token</td></tr>
-<tr><td><strong>分块数</strong></td><td>n_chunks</td><td>文本被切成的块数</td><td>ceil(字符数 / 分块大小)</td></tr>
-<tr><td><strong>分块大小</strong></td><td>Lc</td><td>每个块包含的字符数</td><td>越大 → 块越少 → 并行度越低；最优≈字符数/128</td></tr>
-<tr><td><strong>重叠</strong></td><td>LO</td><td>相邻块重叠字符数</td><td>越大 → BPE越稳定 → merge开销越大 O(LO<sup>2</sup>)</td></tr>
-<tr><td><strong>线程/进程</strong></td><td>t/w</td><td>并行工作线程/进程数</td><td>单核 t=2 饱和，进程池 w=16 最优</td></tr>
-</tbody>
-</table>
-<details class="fold" open><summary>展开穷举数据库 (Qwen3.5 中文+英文)</summary><div class="bd"><div class="bd">
+<h2>Qwen3.5 (248K 词汇表)</h2>
+<details class="d1"><summary>中文</summary><div class="bd">
 <details class="d2"><summary>1K — 534 token — 最佳 Lc=1,024 LO=512 t=2 加速40.04x</summary><div class="bd">
 <details class="d3"><summary>分块大小 Lc=64 — 1 个重叠值 — 加速12.38x</summary><div class="bd">
 <table><thead><tr><th>重叠<br>LO</th><th>t=1<br><span class="u">Pool/Total/Ratio</span></th><th>t=2<br><span class="u">Pool/Total/Ratio</span></th><th>t=4<br><span class="u">Pool/Total/Ratio</span></th><th>t=8<br><span class="u">Pool/Total/Ratio</span></th><th>t=16<br><span class="u">Pool/Total/Ratio</span></th><th>t=32<br><span class="u">Pool/Total/Ratio</span></th><th>t=64<br><span class="u">Pool/Total/Ratio</span></th></tr></thead><tbody>
@@ -2316,42 +1975,4 @@ for qv in range(len(ca)):
 </div></details>
 </div></details>
 </div></details>
-</body></html></div></details>
-</div>
-<div class="sec" id="repro"><h2>复现指南</h2>
-
-<h3>要求</h3>
-<table><thead><tr><th>资源</th><th>要求</th></tr></thead>
-<tbody>
-<tr><td>Python</td><td>&ge;3.10</td></tr>
-<tr><td>依赖</td><td><code>pip install transformers</code></td></tr>
-<tr><td>分词器</td><td>从 HuggingFace 下载到本地</td></tr>
-<tr><td>硬件</td><td>&ge;1 核 (线程池) / &ge;4 核 (进程池)</td></tr>
-</tbody></table>
-
-<h3>命令行</h3>
-<pre style="font-family:var(--mono);font-size:.82rem;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:14px;overflow-x:auto;line-height:1.6">
-# 穷举搜索 (线程池)
-python src/lopt_sweep.py --lang zh --md results/my_zh.md
-
-# 进程池对比
-python src/lopt_bench_process.py --lang en --tokenizer /path/to/tok \
-  --sizes 128K,512K,1024K --workers 2,4,8,16,32 --lo 64
-
-# 快速验证
-bash scripts/run_quick_test.sh /path/to/tokenizer</pre>
-
-<h3>文件索引</h3>
-<table><thead><tr><th>文件</th><th>位置</th><th>内容</th></tr></thead>
-<tbody>
-<tr><td>综合报告</td><td><code>docs/html/index.html</code></td><td>此文件</td></tr>
-<tr><td>完整数据库</td><td>内置于"完整原始数据库"节</td><td>2000+ 组，可叠叠展开</td></tr>
-<tr><td>远端原始数据</td><td><code>/root/LoPT/out/search_qwen_full_20260526/</code></td><td>search_detail.jsonl (3.5MB)</td></tr>
-</tbody></table>
-</div>
-
-<div style="text-align:center;padding:32px 0 48px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;">
-<p>LoPT 并行分词器 基准测试报告 &middot; 2026-05-26 &middot; ARM 单核验证 &middot; <code>lightnateriver/LightTokenizer</code></p>
-</div>
-
-</div></body></html>
+</body></html>
