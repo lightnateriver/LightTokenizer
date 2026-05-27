@@ -1,0 +1,99 @@
+{
+  "language": "zh",
+  "target_chars": 1048576,
+  "final_chars": 1048576,
+  "sources": [
+    {
+      "url": "https://www.gov.cn/zhengce/index.htm",
+      "extracted_chars": 1719,
+      "kept_chars": 829
+    },
+    {
+      "url": "https://www.gov.cn/yaowen/index.htm",
+      "extracted_chars": 0,
+      "kept_chars": 0
+    },
+    {
+      "url": "https://www.news.cn/politics/",
+      "extracted_chars": 2043,
+      "kept_chars": 1243
+    },
+    {
+      "url": "https://www.news.cn/fortune/",
+      "extracted_chars": 47,
+      "kept_chars": 0
+    },
+    {
+      "url": "https://www.news.cn/tech/",
+      "extracted_chars": 1016,
+      "kept_chars": 241
+    },
+    {
+      "url": "https://cloud.tencent.com/developer/doc/1024",
+      "extracted_chars": 1586,
+      "kept_chars": 147
+    },
+    {
+      "url": "https://help.aliyun.com/zh/ecs/",
+      "extracted_chars": 1972,
+      "kept_chars": 247
+    },
+    {
+      "url": "https://help.aliyun.com/zh/oss/",
+      "extracted_chars": 2246,
+      "kept_chars": 150
+    },
+    {
+      "url": "https://help.aliyun.com/zh/model-studio/",
+      "extracted_chars": 5497,
+      "kept_chars": 1299
+    },
+    {
+      "url": "https://help.aliyun.com/zh/pai/",
+      "extracted_chars": 1252,
+      "kept_chars": 132
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_01_0001.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_01_0002.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_01_0003.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_01_0017.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_05_0001.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_05_0002.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_05_0003.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_25_0001.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://support.huaweicloud.com/usermanual-modelarts/modelarts_23_0001.html",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://cloud.tencent.com/developer/doc/1034",
+      "error": "HTTP Error 404: Not Found"
+    }
+  ]
+}

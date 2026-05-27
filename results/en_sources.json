@@ -1,0 +1,118 @@
+{
+  "language": "en",
+  "target_chars": 1048576,
+  "final_chars": 1048576,
+  "sources": [
+    {
+      "url": "https://docs.python.org/3/tutorial/index.html",
+      "extracted_chars": 7123,
+      "kept_chars": 2778
+    },
+    {
+      "url": "https://docs.python.org/3/library/asyncio.html",
+      "extracted_chars": 3638,
+      "kept_chars": 1101
+    },
+    {
+      "url": "https://docs.python.org/3/library/concurrent.futures.html",
+      "extracted_chars": 27025,
+      "kept_chars": 10985
+    },
+    {
+      "url": "https://docs.python.org/3/library/multiprocessing.html",
+      "extracted_chars": 113344,
+      "kept_chars": 47016
+    },
+    {
+      "url": "https://docs.python.org/3/library/pathlib.html",
+      "extracted_chars": 60077,
+      "kept_chars": 20047
+    },
+    {
+      "url": "https://docs.python.org/3/library/queue.html",
+      "extracted_chars": 11843,
+      "kept_chars": 4656
+    },
+    {
+      "url": "https://docs.python.org/3/reference/lexical_analysis.html",
+      "extracted_chars": 42803,
+      "kept_chars": 19529
+    },
+    {
+      "url": "https://docs.python.org/3/reference/compound_stmts.html",
+      "extracted_chars": 59424,
+      "kept_chars": 28019
+    },
+    {
+      "url": "https://numpy.org/doc/stable/user/absolute_beginners.html",
+      "extracted_chars": 48111,
+      "kept_chars": 24424
+    },
+    {
+      "url": "https://numpy.org/doc/stable/reference/arrays.ndarray.html",
+      "extracted_chars": 23623,
+      "kept_chars": 7835
+    },
+    {
+      "url": "https://pandas.pydata.org/docs/user_guide/index.html",
+      "extracted_chars": 8134,
+      "kept_chars": 1302
+    },
+    {
+      "url": "https://pytorch.org/docs/stable/index.html",
+      "extracted_chars": 43,
+      "kept_chars": 0
+    },
+    {
+      "url": "https://pytorch.org/docs/stable/generated/torch.nn.Module.html",
+      "extracted_chars": 66,
+      "kept_chars": 53
+    },
+    {
+      "url": "https://pytorch.org/docs/stable/data.html",
+      "extracted_chars": 42,
+      "kept_chars": 0
+    },
+    {
+      "url": "https://fastapi.tiangolo.com/",
+      "extracted_chars": 19182,
+      "kept_chars": 6294
+    },
+    {
+      "url": "https://www.sqlite.org/lang.html",
+      "extracted_chars": 1596,
+      "kept_chars": 460
+    },
+    {
+      "url": "https://www.sqlite.org/queryplanner.html",
+      "extracted_chars": 25569,
+      "kept_chars": 22168
+    },
+    {
+      "url": "https://www.postgresql.org/docs/current/index.html",
+      "extracted_chars": 3698,
+      "kept_chars": 721
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "extracted_chars": 450782,
+      "kept_chars": 305665
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc6455.html",
+      "extracted_chars": 142178,
+      "kept_chars": 107929
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9000.html",
+      "extracted_chars": 366132,
+      "kept_chars": 278670
+    },
+    {
+      "url": "https://www.gnu.org/software/bash/manual/bash.html",
+      "extracted_chars": 521451,
+      "kept_chars": 261473
+    }
+  ],
+  "errors": []
+}

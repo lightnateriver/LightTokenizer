@@ -1,0 +1,958 @@
+INFO 05-26 22:01:25 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 05-26 22:01:25 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 05-26 22:01:25 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 05-26 22:01:25 [__init__.py:238] Platform plugin ascend is activated
+WARNING 05-26 22:01:29 [config.py:70] Support for Transformers v4 is deprecated. The Transformers v4 codepath will become unmaintained in vLLM v0.22.0 and will be removed in vLLM v0.24.0. Please upgrade to Transformers v5: pip install --upgrade transformers
+INFO 05-26 22:01:32 [config.py:801] Detected quantization_config.scale_fmt=ue8m0; enabling UE8M0 for DeepGEMM.
+INFO 05-26 22:01:32 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:01:42 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:01:54 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+Task was destroyed but it is pending!
+task: <Task pending name='Task-3' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-16' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+INFO 05-26 22:02:05 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:02:17 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:02:28 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:02:40 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:02:51 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:03:03 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:03:16 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:03:29 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:03:42 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:04:08 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:04:19 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+Task was destroyed but it is pending!
+task: <Task pending name='Task-159' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+INFO 05-26 22:04:30 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:04:41 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:04:52 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:05:03 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:05:28 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:05:40 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:05:52 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:06:18 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:06:45 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+INFO 05-26 22:07:12 [config.py:431] Replacing legacy 'type' key with 'rope_type'
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Task was destroyed but it is pending!
+task: <Task pending name='Task-315' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-328' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-341' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Task was destroyed but it is pending!
+task: <Task pending name='Task-471' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-484' coro=<AsyncMicrobatchTokenizer._batch_encode_loop() running at /root/LoPT/vllm_latest/vllm/utils/async_utils.py:93> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Token indices sequence length is longer than the specified maximum sequence length for this model (290892 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (290892 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (290892 > 262144). Running this sequence through the model will result in indexing errors
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Token indices sequence length is longer than the specified maximum sequence length for this model (409030 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (409030 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (409030 > 262144). Running this sequence through the model will result in indexing errors
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Token indices sequence length is longer than the specified maximum sequence length for this model (499927 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (499927 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (499927 > 262144). Running this sequence through the model will result in indexing errors
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+Token indices sequence length is longer than the specified maximum sequence length for this model (581755 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (581755 > 262144). Running this sequence through the model will result in indexing errors
+Token indices sequence length is longer than the specified maximum sequence length for this model (581755 > 262144). Running this sequence through the model will result in indexing errors
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'Qwen2Tokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+{
+  "record_count": 48,
+  "json_path": "/root/LoPT/out/replay_merged_20260526/final_replay_results.json",
+  "csv_path": "/root/LoPT/out/replay_merged_20260526/final_replay_results.csv",
+  "markdown_path": "/root/LoPT/out/replay_merged_20260526/final_replay_tables.md"
+}

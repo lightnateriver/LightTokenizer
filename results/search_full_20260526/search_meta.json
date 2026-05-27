@@ -1,0 +1,63 @@
+{
+  "cpuset_policy": "29-31,40-79,155-159",
+  "languages": [
+    "en",
+    "zh"
+  ],
+  "lengths": [
+    "1k",
+    "4k",
+    "8k",
+    "16k",
+    "32k",
+    "64k",
+    "128k",
+    "256k",
+    "512k",
+    "720k",
+    "880k",
+    "1024k"
+  ],
+  "worker_values": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "chunk_multipliers": [
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "overlap_values": [
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "repeats": 1,
+  "min_match_tokens": 2,
+  "families": [
+    {
+      "family_name": "DeepSeek-V4-Pro",
+      "model_name": "deepseek-ai/DeepSeek-V4-Pro",
+      "tokenizer_path": "/root/LoPT/tokenizers/deepseek_v4_pro",
+      "tokenizer_mode": "hf"
+    },
+    {
+      "family_name": "Qwen3.5",
+      "model_name": "Qwen/Qwen3.5-4B",
+      "tokenizer_path": "/root/LoPT/tokenizers/qwen3_5_4b",
+      "tokenizer_mode": "hf"
+    }
+  ]
+}
