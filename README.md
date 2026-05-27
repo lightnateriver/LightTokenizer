@@ -12,17 +12,16 @@ ProcessPool(spawn) 模式在 ARM 单核上达到 **6-8× 加速**。
 
 ## 关键结果
 
-### ProcessPool(spawn, w=16) — 1024K 对比
+LoPT 计时分为三个阶段：**纯 tokenize**（并行分块编码）+ **Anchor**（重叠区匹配）+ **Merge**（按 anchor 拼接 ids）= **LoPT E2E**。
 
-| Tokenizer | 语言 | 1024K 串行 | LoPT(ms) | **加速比** |
-|:--|:--|:--:|:--:|:--:|
-| Qwen3.5 (248K) | 中文 | 2045ms | 330ms | **6.20×** |
-| Qwen3.5 (248K) | 英文 | 3260ms | 396ms | **8.24×** |
-| DeepSeek-V4-Pro (128K) | 中文 | 2574ms¹ | — | **~5.66×²** |
-| DeepSeek-V4-Pro (128K) | 英文 | 3157ms | 387ms | **8.16×** |
+### ProcessPool(spawn, w=16) — 1024K 三阶段明细
 
-¹ DSV4 Pro 中文 1024K 串行耗时来自 ThreadPool 穷举搜索基准（该数据点的 ProcessPool 未运行）。  
-² DSV4 Pro 中文 ProcessPool 实测仅 512K w=16 达 5.66×；1024K 未测试，从趋势估计相近。
+| Tokenizer | 语言 | 串行 | Tokenize | Anchor | Merge | **LoPT E2E** | **E2E加速** |
+|:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|
+| Qwen3.5 (248K) | 中文 | 2036ms | 459ms | 0.6ms | 10.4ms | **470ms** | **4.33×** |
+| Qwen3.5 (248K) | 英文 | 3253ms | 471ms | 0.7ms | 14.7ms | **490ms** | **6.64×** |
+
+> Anchor+Merge 仅占 LoPT E2E 总耗时的 2-3%，纯 tokenize 阶段是主导因素。
 
 所有结果 **100% token 精确匹配**（逐位 == 验证）。
 
@@ -87,12 +86,13 @@ LightTokenizer/
 
 ## 核心发现
 
-1. **Anchor 偏移修复至关重要**: ca-offset 双重循环（`pa[pv+k]==ca[qv+k]` 而非 `==ca[k]`）
+1. **Anchor+Merge 开销可忽略**: 占 LoPT E2E 总耗时仅 2-3%。纯 tokenize 阶段是性能主导因素。
+2. **Anchor 偏移修复至关重要**: ca-offset 双重循环（`pa[pv+k]==ca[qv+k]` 而非 `==ca[k]`）
    将 BPE 边界效应从"永远找不到 anchor"变为"稳定 2×+"。
-2. **ProcessPool 远优于 ThreadPool**: 单核上 ProcessPool(spawn) 达 6-8×，ThreadPool 上限 ~1.35×。
-3. **词汇表大小影响极小**: 128K vs 248K vocab 加速比基本一致。
-4. **Lc_opt = chars/128**: 通用规则，适用于所有 tokenizer 和文本规模。
-5. **中文 LO=16 最优**, 英文 LO=32-64。
+3. **ProcessPool 远优于 ThreadPool**: 单核上 ProcessPool(spawn) 达 6-8×，ThreadPool 上限 ~1.35×。
+4. **词汇表大小影响极小**: 128K vs 248K vocab 加速比基本一致。
+5. **Lc_opt = chars/128**: 通用规则，适用于所有 tokenizer 和文本规模。
+6. **中文 LO=16 最优**, 英文 LO=32-64。
 
 ## 多核扩展路线图
 

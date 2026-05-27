@@ -354,6 +354,27 @@ for qv in range(len(ca)):
 </tbody></table>
 
 </div>
+<div class="sec" id="e2e"><h2>LoPT E2E 三阶段明细</h2>
+<div class="lead">LoPT 完整端到端计时 = 纯 tokenize（并行分块编码）+ Anchor（重叠区匹配）+ Merge（按 anchor 拼接）。Anchor+Merge 仅占 E2E 总耗时 2-3%。</div>
+<h3>中文 (LO=16)</h3>
+<table><thead><tr><th>规模</th><th>工作进程数</th><th>串行<span class="u"> (ms)</span></th><th>Tokenize<span class="u"> (ms)</span></th><th>Anchor<span class="u"> (ms)</span></th><th>Merge<span class="u"> (ms)</span></th><th>LoPT E2E<span class="u"> (ms)</span></th><th>E2E加速</th><th>开销占比</th></tr></thead>
+<tbody>
+<tr><td>512K</td><td class="n">8</td><td class="n">978</td><td class="n g">294</td><td class="n">0.6</td><td class="n">4.9</td><td class="n g">299</td><td class="n g">3.26x</td><td class="n">1.8%</td></tr>
+<tr><td>512K</td><td class="n">16</td><td class="n">978</td><td class="n g">223</td><td class="n">0.6</td><td class="n">5.2</td><td class="n g">229</td><td class="n g">4.27x</td><td class="n">2.5%</td></tr>
+<tr><td>1024K</td><td class="n">8</td><td class="n">2036</td><td class="n g">539</td><td class="n">0.7</td><td class="n">11.4</td><td class="n g">550</td><td class="n g">3.70x</td><td class="n">2.2%</td></tr>
+<tr><td>1024K</td><td class="n">16</td><td class="n">2036</td><td class="n g">459</td><td class="n">0.6</td><td class="n">10.4</td><td class="n g">470</td><td class="n g">4.33x</td><td class="n">2.3%</td></tr>
+</tbody></table>
+<h3>英文 (LO=32)</h3>
+<table><thead><tr><th>规模</th><th>工作进程数</th><th>串行<span class="u"> (ms)</span></th><th>Tokenize<span class="u"> (ms)</span></th><th>Anchor<span class="u"> (ms)</span></th><th>Merge<span class="u"> (ms)</span></th><th>LoPT E2E<span class="u"> (ms)</span></th><th>E2E加速</th><th>开销占比</th></tr></thead>
+<tbody>
+<tr><td>512K</td><td class="n">8</td><td class="n">1563</td><td class="n g">348</td><td class="n">0.4</td><td class="n">5.0</td><td class="n g">354</td><td class="n g">4.42x</td><td class="n">1.5%</td></tr>
+<tr><td>512K</td><td class="n">16</td><td class="n">1563</td><td class="n g">698</td><td class="n">0.6</td><td class="n">6.0</td><td class="n g">705</td><td class="n g">2.22x</td><td class="n">0.9%</td></tr>
+<tr><td>1024K</td><td class="n">8</td><td class="n">3253</td><td class="n g">603</td><td class="n">0.8</td><td class="n">13.4</td><td class="n g">617</td><td class="n g">5.27x</td><td class="n">2.3%</td></tr>
+<tr><td>1024K</td><td class="n">16</td><td class="n">3253</td><td class="n g">471</td><td class="n">0.7</td><td class="n">14.7</td><td class="n g">490</td><td class="n g">6.64x</td><td class="n">3.2%</td></tr>
+</tbody></table>
+<div class="insight">Anchor 查找（0.4-0.8ms）几乎为零。Merge 拼接（5-15ms）是固定开销，不随 tokenize 加速而减少。纯 tokenize 阶段主导一切：tokenize 快则 E2E 快，tokenize 慢则 E2E 慢。</div>
+</div>
+
 <div class="sec" id="select"><h2>自动选择指南</h2>
 <div class="lead">select_pool(块数) 根据分块数自动选择最佳池类型。</div>
 <div class="dtree">

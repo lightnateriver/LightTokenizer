@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""
-ProcessPool vs ThreadPool vs Serial — 全量对比。
-用法:
-  python3 lopt_bench_process.py --lang zh --sizes 128K,512K,1024K --workers 2,4,8,16,32
-  python3 lopt_bench_process.py --lang en --tokenizer /path/to/dsv4_tokenizer
+"""ProcessPool vs ThreadPool vs Serial benchmark.
 
-输出: 中位值 3 次测量，含 warmup，ProcessPool(spawn) 模式。
+Output: median of 3 runs with warmup, ProcessPool(spawn).
+Three-phase timing: pure tokenize + Anchor search + Merge = LoPT E2E.
 """
-import time, statistics, argparse, math, multiprocessing as mp
+import time, statistics, argparse, math, bisect, multiprocessing as mp
 from concurrent.futures import ThreadPoolExecutor
+from typing import List, Tuple, Optional
 
 # 20 短段中文新闻
 ZH = [
@@ -60,7 +58,7 @@ TOK_PATH = "/mnt/sfs_turbo/models/qwen3.5-35b-a3b"
 
 
 def pick_lc(chars):
-    """从搜索脚本的 Lc 候选中取中位值。"""
+    """Pick median Lc from candidate set."""
     vals = set()
     start = max(64, chars // 128)
     val = start
@@ -77,6 +75,68 @@ def pick_lc(chars):
         r = [r[int(i*step)] for i in range(8)]
         r = sorted(set(r))
     return r[len(r)//2] if r else 65536
+
+
+# ═══ Anchor 查找 + Merge 拼接 ═══
+def find_anchor(off_p, off_c, ostart, oend):
+    """Find longest matching token sequence (anchor) in overlap region."""
+    n_p, n_c = len(off_p), len(off_c)
+    l = bisect.bisect_left(off_p, (ostart, 0))
+    ps = None
+    if l > 0 and off_p[l-1][1] > ostart:
+        ps = l - 1
+    elif l < n_p and off_p[l][0] < oend:
+        ps = l
+    if ps is None:
+        return None, None, None
+    r = bisect.bisect_left(off_c, (oend, 0))
+    ce = r - 1
+    if ce >= 0 and off_c[ce][1] <= ostart:
+        while ce >= 0 and off_c[ce][1] <= ostart:
+            ce -= 1
+    if ce < 0:
+        return None, None, None
+    pa = off_p[ps:]
+    ca = off_c[:ce+1]
+    bl, bp, bq = 0, None, None
+    for pv in range(len(pa)-1, -1, -1):
+        for qv in range(len(ca)-1, -1, -1):
+            mk = min(len(pa)-pv, len(ca)-qv)
+            if mk <= bl:
+                continue
+            k = 0
+            while k < mk and pa[pv+k] == ca[qv+k]:
+                k += 1
+            if k > bl:
+                bl, bp, bq = k, pv, qv
+    if bl == 0:
+        return None, None, None
+    return ps + bp, bl, bq
+
+
+def merge_chunks(res, anchors):
+    """Merge chunk results into complete token IDs via anchors."""
+    segs = []
+    tl = 0
+    s = res[0][0][:anchors[0][0] + anchors[0][1]]
+    segs.append(s)
+    tl += len(s)
+    for i in range(1, len(res) - 1):
+        st = anchors[i-1][2] + anchors[i-1][1]
+        en = anchors[i][0] + anchors[i][1]
+        if en > st:
+            s = res[i][0][st:en]
+            segs.append(s)
+            tl += len(s)
+    s = res[-1][0][anchors[-1][2] + anchors[-1][1]:]
+    segs.append(s)
+    tl += len(s)
+    m = [0] * tl
+    p = 0
+    for seg in segs:
+        m[p:p+len(seg)] = seg
+        p += len(seg)
+    return m
 
 
 # ═══ Worker（每个 spawn 进程有独立 tokenizer） ═══
@@ -125,10 +185,10 @@ def main():
     print(f"# Lang={args.lang} Tok={args.tokenizer} Workers={worker_list} LO={args.lo}")
     cols = f"{'Size':>8} {'Tok':>10} {'Chars':>10} {'Lc':>8} {'Chk':>5}"
     cols += f" {'Serial':>9} {'TPool':>9} {'TPx':>6}"
-    cols += f" {'PPool':>9} {'PPx':>6} {'Warm':>6} {'Wkr':>5}"
+    cols += f" {'PPool':>9} {'PPx':>6} {'Anchor':>9} {'Merge':>9} {'LoPT_E2E':>10} {'E2Ex':>6} {'Wkr':>5}"
     print(f"# {cols}")
     sep = f"{'─'*8} {'─'*10} {'─'*10} {'─'*8} {'─'*5}"
-    sep += f" {'─'*9} {'─'*9} {'─'*6} {'─'*9} {'─'*6} {'─'*6} {'─'*5}"
+    sep += f" {'─'*9} {'─'*9} {'─'*6} {'─'*9} {'─'*6} {'─'*9} {'─'*9} {'─'*10} {'─'*6} {'─'*5}"
     print(f"# {sep}")
 
     for target in sz:
@@ -179,23 +239,38 @@ def main():
             try:
                 # warmup
                 pool.map(worker, chunks[:min(nt, nc)])
-                wt = []
+                # measure: 3 runs of full LoPT e2e (tokenize + anchor + merge)
+                pp_times, anc_times, mrg_times, e2e_times = [], [], [], []
                 for _ in range(3):
                     t0 = time.perf_counter()
-                    pool.map(worker, chunks[:min(nt, nc)])
-                    wt.append((time.perf_counter()-t0)*1000)
-                warm = statistics.median(wt)
-                # measure
-                pt = []
-                for _ in range(3):
-                    t0 = time.perf_counter()
-                    pool.map(worker, chunks)
-                    pt.append((time.perf_counter()-t0)*1000)
-                pp = statistics.median(pt)
+                    res = pool.map(worker, chunks)
+                    t1 = time.perf_counter()
+                    pp_times.append((t1-t0)*1000)
+
+                    # anchor
+                    anchors = []
+                    for i in range(1, len(res)):
+                        a = find_anchor(res[i-1][1], res[i][1], i*lc, i*lc+args.lo)
+                        if a[0] is not None and a[1] > 0:
+                            anchors.append(a)
+                    t2 = time.perf_counter()
+                    anc_times.append((t2-t1)*1000)
+
+                    # merge
+                    merge_chunks(res, anchors)
+                    t3 = time.perf_counter()
+                    mrg_times.append((t3-t2)*1000)
+                    e2e_times.append((t3-t0)*1000)
+
+                pp = statistics.median(pp_times)
+                an = statistics.median(anc_times)
+                mr = statistics.median(mrg_times)
+                ee = statistics.median(e2e_times)
                 print(f"  {label:>8} {n_tok:>10} {n:>10} {lc:>8} {nc:>5} "
                       f"{ser:>9.1f} {tp:>9.1f} {ser/tp:>5.2f}× "
                       f"{pp:>9.1f} {ser/pp:>5.2f}× "
-                      f"{warm:>6.1f} {nt:>5}", flush=True)
+                      f"{an:>9.1f} {mr:>9.1f} {ee:>10.1f} {ser/ee:>5.2f}× "
+                      f"{nt:>5}", flush=True)
             finally:
                 pool.close()
                 pool.join()
