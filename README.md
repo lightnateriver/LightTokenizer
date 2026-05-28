@@ -10,8 +10,9 @@
 
 1. [docs/agent_quickstart.md](docs/agent_quickstart.md)
 2. [docs/project_status.md](docs/project_status.md)
-3. [docs/architecture.md](docs/architecture.md)
-4. [index.html](index.html)
+3. [docs/optimization_journal.md](docs/optimization_journal.md)
+4. [docs/architecture.md](docs/architecture.md)
+5. [index.html](index.html)
 
 ## 项目背景
 
@@ -29,7 +30,7 @@ OpenAIServingTokenization.create_tokenize
 
 这条链路对**多请求并发**是友好的，但对于**单条超长输入**，底层仍然基本表现为“一次超长 Tokenizer 调用”。当输入规模上升到 `512k`、`720k`、`1024k` 字符时，Tokenizer 很容易成为 API Server 侧最核心的 CPU 瓶颈。
 
-本项目围绕这个问题，基于最新本地 `vLLM` 源码构建基线，并实现 LoPT 风格的第一版多进程优化原型。
+本项目围绕这个问题，基于最新本地 `vLLM` 源码构建基线，并实现 LoPT 风格的多进程优化原型。当前主线已经推进到 `v2.1`，并完成了对 `v1` 的对照与回放复核。
 
 ## 目标与问题定义
 
@@ -85,6 +86,27 @@ LoPT v1 的核心思路是：
 - 全局字符位置回映
 
 这部分工作既影响正确性，也会带来额外耗时，所以本项目将它单独拆成 `chunk_dedup_time_ms` 指标进行统计。
+
+## v2.1 版本说明
+
+`v2.1` 在 `v1` 的基础上继续保留：
+
+- 字符切块
+- 多进程并行 tokenization
+- overlap 去重
+- exact-match 精度标准
+
+同时补强了：
+
+- `dispatch_submit_time_ms`
+- `dispatch_collect_time_ms`
+- `worker_encode_time_ms_sum / max`
+- `worker_materialize_time_ms_sum / max`
+- `collect_child_compute_makespan_s`
+- `collect_result_return_tail_s`
+- `collect_result_receive_lag_max_s`
+
+它的定位是更细粒度地看清瓶颈，而不是改变最终 token IDs 目标。
 
 ## 论文参考
 
@@ -187,12 +209,17 @@ LoPT 方案只有在以下条件全部满足时才算有效：
 ## 当前工程内容
 
 ```text
+src/
+  保留原始 LightTokenizer v1 时代代码
+
 benchmarks/
   collect_env_info.py
   compare_replay_results.py
   expand_existing_corpora.py
+  generate_docs_legacy_report.py
   generate_html_report.py
   lopt_tokenizer.py
+  lopt_v2/
   postprocess_search_results.py
   real_web_corpus.py
   replay_best_configs.py
@@ -203,6 +230,9 @@ docs/
   agent_quickstart.md
   architecture.md
   benchmark_methodology.md
+  index_v1_template.html
+  index.html
+  optimization_journal.md
   project_status.md
   repro_commands.md
   results_guide.md
@@ -212,17 +242,26 @@ results/
   benchmark_env_info.json
   en_sources.json
   zh_sources.json
-  search_full_20260526/
-  search_qwen_full_20260526/
   search_merged_20260526/
+  search_merged_v2_1_20260528/
   replay_merged_20260526/
-  spotcheck_codex_20260527/
-  spotcheck_codex_20260527_r3/
+  replay_merged_v2_1_20260528/
 
-index.html
 AGENTS.md
 README.md
 ```
+
+## 当前结果目录
+
+当前建议优先阅读以下目录：
+
+- `results/search_merged_v2_1_20260528/`
+- `results/replay_merged_v2_1_20260528/`
+
+旧版 v1 参考目录保留为：
+
+- `results/search_merged_20260526/`
+- `results/replay_merged_20260526/`
 
 ## 最终结果展示
 
@@ -234,7 +273,15 @@ README.md
 
 这意味着最终汇总中的所有最佳配置都通过了严格精度校验。
 
-### 2. 代表性结果
+### 2. v2.1 总体结果
+
+- v2.1 完整搜索候选总数：`7263`
+- v2.1 最终 replay 结果总数：`48`
+- v2.1 最终 replay 精度结论：`全部 exact match`
+- v2.1 对 v1 平均提速：`1.488x`
+- v2.1 平均 E2E 降幅：`41.93%`
+
+### 3. 代表性结果
 
 | 场景 | 原生 E2E (ms) | 原生 Tokenizer (ms) | LoPT E2E (ms) | 多进程段 (ms) | 去冗余段 (ms) | E2E 加速比 | Tokenizer 加速比 | Tokenizer 降幅 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -245,7 +292,7 @@ README.md
 | Qwen3.5 / zh / 1024k | 1298.834 | 1290.088 | 543.928 | 280.161 | 263.767 | 2.388x | 4.605x | 78.284% |
 | Qwen3.5 / en / 1024k | 804.694 | 800.860 | 276.132 | 173.767 | 102.365 | 2.914x | 4.609x | 78.302% |
 
-### 3. 1024k 最优配置示例
+### 4. 1024k 最优配置示例
 
 | 模型 | 语言 | workers | chunk_count | overlap_chars | LoPT E2E (ms) | E2E 加速比 | Tokenizer 加速比 | 精度 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -254,7 +301,7 @@ README.md
 | Qwen3.5 | zh | 16 | 64 | 64 | 543.928 | 2.388x | 4.605x | exact |
 | Qwen3.5 | en | 32 | 128 | 64 | 276.132 | 2.914x | 4.609x | exact |
 
-### 4. Spot Check 复验
+### 5. Spot Check 复验
 
 当前仓库还保留了远端 spot check 结果，对 4 个代表性 case 做了复验：
 
@@ -274,7 +321,7 @@ README.md
 - [results/spotcheck_codex_20260527_r3/spotcheck_summary.md](results/spotcheck_codex_20260527_r3/spotcheck_summary.md)
 - [results/spotcheck_codex_20260527_r3/spotcheck_compare.json](results/spotcheck_codex_20260527_r3/spotcheck_compare.json)
 
-### 5. 完整结果查看方式
+### 6. 完整结果查看方式
 
 完整结果不要只看 README，建议直接打开：
 
@@ -286,6 +333,8 @@ HTML 报告中已经包含：
 - 原生瓶颈分析
 - vLLM Tokenizer 执行链路
 - LoPT 原理与字符流程图
+- v2.1 版本摘要
+- v1 / v2.1 对比
 - 实验环境信息
 - 最优配置总览
 - 原生 vs LoPT 曲线图 / 柱状图
@@ -302,8 +351,9 @@ HTML 报告中已经包含：
 2. [docs/architecture.md](docs/architecture.md)
 3. [docs/results_guide.md](docs/results_guide.md)
 4. [docs/repro_commands.md](docs/repro_commands.md)
+5. [docs/optimization_journal.md](docs/optimization_journal.md)
 
-其中 `README.md` 负责给出全局背景，`agent_quickstart.md` 负责帮助新 session 快速接手项目。
+其中 `README.md` 负责给出全局背景，`agent_quickstart.md` 负责帮助新 session 快速接手项目，`optimization_journal.md` 负责持续记录优化演进。
 
 ### 如果你只想看最终结论
 
@@ -351,7 +401,7 @@ HTML 报告中已经包含：
 
 - `benchmarks/generate_html_report.py`
 
-生成仓库根目录的最终报告：
+生成仓库根目录 `index.html` 最终报告：
 
 - [index.html](index.html)
 
@@ -369,6 +419,14 @@ HTML 报告中已经包含：
 
 - 最终报告：
   - [index.html](index.html)
+- v2.1 最终 replay：
+  - [results/replay_merged_v2_1_20260528/final_replay_results.json](results/replay_merged_v2_1_20260528/final_replay_results.json)
+  - [results/replay_merged_v2_1_20260528/final_replay_results.csv](results/replay_merged_v2_1_20260528/final_replay_results.csv)
+  - [results/replay_merged_v2_1_20260528/final_replay_tables.md](results/replay_merged_v2_1_20260528/final_replay_tables.md)
+- v2.1 全量搜索汇总：
+  - [results/search_merged_v2_1_20260528/search_detail.jsonl](results/search_merged_v2_1_20260528/search_detail.jsonl)
+  - [results/search_merged_v2_1_20260528/best_configs.json](results/search_merged_v2_1_20260528/best_configs.json)
+  - [results/search_merged_v2_1_20260528/worker_best_configs.json](results/search_merged_v2_1_20260528/worker_best_configs.json)
 - 最终 replay：
   - [results/replay_merged_20260526/final_replay_results.json](results/replay_merged_20260526/final_replay_results.json)
   - [results/replay_merged_20260526/final_replay_results.csv](results/replay_merged_20260526/final_replay_results.csv)

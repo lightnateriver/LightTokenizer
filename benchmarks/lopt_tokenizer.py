@@ -70,8 +70,18 @@ class LoPTResult:
     token_ids: list[int]
     raw_token_ids: list[int]
     chat_template_time_s: float
+    dispatch_submit_time_s: float
+    dispatch_collect_time_s: float
     dispatch_process_collect_time_s: float
+    collect_child_compute_makespan_s: float
+    collect_result_return_tail_s: float
+    collect_result_receive_lag_max_s: float
+    collect_result_receive_lag_avg_s: float
     chunk_dedup_time_s: float
+    worker_encode_time_s_sum: float
+    worker_encode_time_s_max: float
+    worker_materialize_time_s_sum: float
+    worker_materialize_time_s_max: float
     process_only_time_s: float
     e2e_time_s: float
     merge_time_s: float
@@ -228,11 +238,17 @@ class LoPTParallelTokenizer:
             return max(1, configured)
         return max(1, math.ceil(len(text) / max(self.config.processes, 1)))
 
-    def _dispatch(self, tasks: list[tuple[int, int, str]]) -> tuple[list[ChunkResult], float]:
-        start = time.perf_counter()
+    def _dispatch(
+        self,
+        tasks: list[tuple[int, int, str]],
+    ) -> tuple[list[ChunkResult], float, float]:
+        submit_start = time.perf_counter()
         futures = [self._pool.submit(_tokenize_chunk, task) for task in tasks]
+        submit_time_s = time.perf_counter() - submit_start
+        collect_start = time.perf_counter()
         results = [future.result() for future in futures]
-        return results, time.perf_counter() - start
+        collect_time_s = time.perf_counter() - collect_start
+        return results, submit_time_s, collect_time_s
 
     def tokenize(
         self,
@@ -254,8 +270,18 @@ class LoPTParallelTokenizer:
                 token_ids=list(final_ids),
                 raw_token_ids=raw_ids,
                 chat_template_time_s=chat_template_time_s,
+                dispatch_submit_time_s=0.0,
+                dispatch_collect_time_s=0.0,
                 dispatch_process_collect_time_s=0.0,
+                collect_child_compute_makespan_s=0.0,
+                collect_result_return_tail_s=0.0,
+                collect_result_receive_lag_max_s=0.0,
+                collect_result_receive_lag_avg_s=0.0,
                 chunk_dedup_time_s=0.0,
+                worker_encode_time_s_sum=0.0,
+                worker_encode_time_s_max=0.0,
+                worker_materialize_time_s_sum=0.0,
+                worker_materialize_time_s_max=0.0,
                 process_only_time_s=0.0,
                 e2e_time_s=0.0,
                 merge_time_s=0.0,
@@ -276,7 +302,10 @@ class LoPTParallelTokenizer:
             chunk_chars = self._initial_chunk_chars(text)
 
         tasks = split_text(text, chunk_chars, active_overlap_chars)
-        results, dispatch_process_collect_time_s = self._dispatch(tasks)
+        results, dispatch_submit_time_s, dispatch_collect_time_s = self._dispatch(tasks)
+        dispatch_process_collect_time_s = (
+            dispatch_submit_time_s + dispatch_collect_time_s
+        )
 
         if len(results) == 1:
             raw_ids = list(results[0].input_ids)
@@ -312,8 +341,18 @@ class LoPTParallelTokenizer:
             token_ids=list(final_ids),
             raw_token_ids=raw_ids,
             chat_template_time_s=chat_template_time_s,
+            dispatch_submit_time_s=dispatch_submit_time_s,
+            dispatch_collect_time_s=dispatch_collect_time_s,
             dispatch_process_collect_time_s=dispatch_process_collect_time_s,
+            collect_child_compute_makespan_s=0.0,
+            collect_result_return_tail_s=0.0,
+            collect_result_receive_lag_max_s=0.0,
+            collect_result_receive_lag_avg_s=0.0,
             chunk_dedup_time_s=chunk_dedup_time_s,
+            worker_encode_time_s_sum=0.0,
+            worker_encode_time_s_max=0.0,
+            worker_materialize_time_s_sum=0.0,
+            worker_materialize_time_s_max=0.0,
             process_only_time_s=dispatch_process_collect_time_s,
             e2e_time_s=e2e_time_s,
             merge_time_s=chunk_dedup_time_s,

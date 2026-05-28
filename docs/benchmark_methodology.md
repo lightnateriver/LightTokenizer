@@ -2,7 +2,7 @@
 
 ## 1. Objective
 
-Measure native vLLM tokenizer performance against LoPT v1 under:
+Measure native vLLM tokenizer performance against LoPT v1 / v2.1 under:
 
 - identical models
 - identical input corpora
@@ -58,7 +58,7 @@ Where:
 - `native_tokenizer_time_ms`
   is measured inside `AsyncMicrobatchTokenizer.encode`
 
-## 5. LoPT v1
+## 5. LoPT v1 / v2.1
 
 LoPT v1 uses:
 
@@ -78,6 +78,15 @@ Where:
 - `lopt_e2e_time_ms = chat_template_time_ms + mp_dispatch_process_collect_time_ms + chunk_dedup_time_ms`
 
 In this completion-style benchmark, `chat_template_time_ms` is effectively `0.0`.
+
+LoPT v2.1 keeps the same exact-match target and search dimensions, but splits
+collect-side timing more finely so we can see:
+
+- submit time
+- collect time
+- child compute time
+- return tail time
+- receive lag
 
 ## 6. Search Variables
 

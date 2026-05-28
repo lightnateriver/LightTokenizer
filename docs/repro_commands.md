@@ -31,24 +31,41 @@ python3 -m benchmarks.real_web_corpus \
 
 ## 3. Run Full Search
 
-DeepSeek + Qwen full search can be run independently and then merged.
+Run the two family-specific searches independently, then merge them.
 
-Example:
+DeepSeek search:
 
 ```bash
 python3 -m benchmarks.search_lopt_configs \
   --vllm-src "$VLLM_SRC" \
   --corpus-dir "$REPO_ROOT/results" \
-  --output-dir "$REPO_ROOT/results/search_full_YYYYMMDD" \
+  --output-dir "$REPO_ROOT/results/search_v2_1_deepseek_20260528" \
   --languages en zh \
-  --families DeepSeek-V4-Pro Qwen3.5 \
+  --families DeepSeek-V4-Pro \
   --worker-values 1,2,4,8,16,32,64 \
   --chunk-multipliers 0.5,1,2,4 \
   --overlap-values 32,64,128,256,512,1024,2048,4096,8192 \
   --renderer-workers 4 \
   --repeats 1 \
   --min-match-tokens 2 \
-  --deepseek-tokenizer-path /path/to/deepseek/tokenizer \
+  --deepseek-tokenizer-path /path/to/deepseek/tokenizer
+```
+
+Qwen search:
+
+```bash
+python3 -m benchmarks.search_lopt_configs \
+  --vllm-src "$VLLM_SRC" \
+  --corpus-dir "$REPO_ROOT/results" \
+  --output-dir "$REPO_ROOT/results/search_v2_1_qwen_20260528" \
+  --languages en zh \
+  --families Qwen3.5 \
+  --worker-values 1,2,4,8,16,32,64 \
+  --chunk-multipliers 0.5,1,2,4 \
+  --overlap-values 32,64,128,256,512,1024,2048,4096,8192 \
+  --renderer-workers 4 \
+  --repeats 1 \
+  --min-match-tokens 2 \
   --qwen-tokenizer-path /path/to/qwen/tokenizer
 ```
 
@@ -57,9 +74,9 @@ python3 -m benchmarks.search_lopt_configs \
 ```bash
 python3 -m benchmarks.postprocess_search_results \
   --input-dir \
-    "$REPO_ROOT/results/search_full_20260526" \
-    "$REPO_ROOT/results/search_qwen_full_20260526" \
-  --output-dir "$REPO_ROOT/results/search_merged_20260526"
+    "$REPO_ROOT/results/search_v2_1_deepseek_20260528" \
+    "$REPO_ROOT/results/search_v2_1_qwen_20260528" \
+  --output-dir "$REPO_ROOT/results/search_merged_v2_1_20260528"
 ```
 
 ## 5. Replay Best Configurations
@@ -69,9 +86,9 @@ Full replay:
 ```bash
 python3 -m benchmarks.replay_best_configs \
   --vllm-src "$VLLM_SRC" \
-  --best-configs-json "$REPO_ROOT/results/search_merged_20260526/best_configs.json" \
+  --best-configs-json "$REPO_ROOT/results/search_merged_v2_1_20260528/best_configs.json" \
   --corpus-dir "$REPO_ROOT/results" \
-  --output-dir "$REPO_ROOT/results/replay_merged_20260526"
+  --output-dir "$REPO_ROOT/results/replay_merged_v2_1_20260528"
 ```
 
 Filtered replay for spot checks:
@@ -79,9 +96,9 @@ Filtered replay for spot checks:
 ```bash
 python3 -m benchmarks.replay_best_configs \
   --vllm-src "$VLLM_SRC" \
-  --best-configs-json "$REPO_ROOT/results/search_merged_20260526/best_configs.json" \
+  --best-configs-json "$REPO_ROOT/results/search_merged_v2_1_20260528/best_configs.json" \
   --corpus-dir "$REPO_ROOT/results" \
-  --output-dir "$REPO_ROOT/results/spotcheck_local" \
+  --output-dir "$REPO_ROOT/results/spotcheck_v2_1_local" \
   --families DeepSeek-V4-Pro Qwen3.5 \
   --languages en zh \
   --lengths 1k 512k 1024k
@@ -91,8 +108,8 @@ python3 -m benchmarks.replay_best_configs \
 
 ```bash
 python3 -m benchmarks.compare_replay_results \
-  --reference-json "$REPO_ROOT/results/replay_merged_20260526/final_replay_results.json" \
-  --candidate-json "$REPO_ROOT/results/spotcheck_local/final_replay_results.json"
+  --reference-json "$REPO_ROOT/results/replay_merged_v2_1_20260528/final_replay_results.json" \
+  --candidate-json "$REPO_ROOT/results/spotcheck_v2_1_local/final_replay_results.json"
 ```
 
 ## 7. Collect Benchmark Host Environment
@@ -106,16 +123,16 @@ python3 -m benchmarks.collect_env_info \
 
 ```bash
 python3 -m benchmarks.generate_html_report \
-  --search-detail-jsonl "$REPO_ROOT/results/search_merged_20260526/search_detail.jsonl" \
-  --worker-best-json "$REPO_ROOT/results/search_merged_20260526/worker_best_configs.json" \
-  --best-json "$REPO_ROOT/results/search_merged_20260526/best_configs.json" \
-  --replay-json "$REPO_ROOT/results/replay_merged_20260526/final_replay_results.json" \
+  --search-detail-jsonl "$REPO_ROOT/results/search_merged_v2_1_20260528/search_detail.jsonl" \
+  --worker-best-json "$REPO_ROOT/results/search_merged_v2_1_20260528/worker_best_configs.json" \
+  --best-json "$REPO_ROOT/results/search_merged_v2_1_20260528/best_configs.json" \
+  --replay-json "$REPO_ROOT/results/replay_merged_v2_1_20260528/final_replay_results.json" \
   --flow-doc "$REPO_ROOT/docs/vllm_tokenizer_flow.md" \
   --output-html "$REPO_ROOT/index.html" \
   --vllm-src "$VLLM_SRC" \
   --search-input-dirs \
-    "$REPO_ROOT/results/search_full_20260526" \
-    "$REPO_ROOT/results/search_qwen_full_20260526" \
+    "$REPO_ROOT/results/search_v2_1_deepseek_20260528" \
+    "$REPO_ROOT/results/search_v2_1_qwen_20260528" \
   --corpus-meta-dir "$REPO_ROOT/results" \
   --env-info-json "$REPO_ROOT/results/benchmark_env_info.json"
 ```

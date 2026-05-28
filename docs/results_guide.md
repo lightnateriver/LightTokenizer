@@ -2,7 +2,7 @@
 
 ## 1. Main Result Directories
 
-### `results/search_full_20260526/`
+### `results/search_v2_1_deepseek_20260528/`
 
 DeepSeek-focused full search output.
 
@@ -18,19 +18,29 @@ Contains:
 - `case_failures.json`
 - `search_meta.json`
 
-### `results/search_qwen_full_20260526/`
+### `results/search_v2_1_qwen_20260528/`
 
 Qwen-focused full search output with the same structure.
 
-### `results/search_merged_20260526/`
+### `results/search_merged_v2_1_20260528/`
 
 Merged and postprocessed search results across model families.
 
 This is the main source for final best-config selection.
 
+### `results/replay_merged_v2_1_20260528/`
+
+v2.1 replay output for the current mainline.
+
+Most important files:
+
+- `final_replay_results.json`
+- `final_replay_results.csv`
+- `final_replay_tables.md`
+
 ### `results/replay_merged_20260526/`
 
-Replay output for final best configurations.
+v1 replay reference output.
 
 Most important files:
 
@@ -84,9 +94,10 @@ same benchmark logic.
 
 `index.html` is generated from:
 
-- `results/search_merged_20260526/search_detail.jsonl`
-- `results/search_merged_20260526/worker_best_configs.json`
-- `results/search_merged_20260526/best_configs.json`
+- `results/search_merged_v2_1_20260528/search_detail.jsonl`
+- `results/search_merged_v2_1_20260528/worker_best_configs.json`
+- `results/search_merged_v2_1_20260528/best_configs.json`
+- `results/replay_merged_v2_1_20260528/final_replay_results.json`
 - `results/replay_merged_20260526/final_replay_results.json`
 - `results/benchmark_env_info.json`
 - `results/en_sources.json`
@@ -113,6 +124,7 @@ When validating a few selected cases, recommended output goes into:
 
 Those spot-check directories can be compared back to:
 
+- `results/replay_merged_v2_1_20260528/final_replay_results.json`
 - `results/replay_merged_20260526/final_replay_results.json`
 
 using:
@@ -123,11 +135,11 @@ using:
 
 For summary reporting, trust:
 
-1. `results/replay_merged_20260526/final_replay_results.json`
+1. `results/replay_merged_v2_1_20260528/final_replay_results.json`
 2. `index.html`
 
 For debugging or re-ranking, use:
 
-1. `results/search_merged_20260526/search_detail.jsonl`
-2. `results/search_merged_20260526/worker_best_configs.json`
-3. `results/search_merged_20260526/best_configs.json`
+1. `results/search_merged_v2_1_20260528/search_detail.jsonl`
+2. `results/search_merged_v2_1_20260528/worker_best_configs.json`
+3. `results/search_merged_v2_1_20260528/best_configs.json`

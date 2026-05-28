@@ -1,13 +1,12 @@
 # Agent Quickstart
 
-This is the first document a new session should read.
+这是新 session 进入仓库后最应该先读的一份文档。
 
-## 1. What This Project Is
+## 1. 项目在做什么
 
-This repository benchmarks a LoPT-style tokenizer optimization against the
-native vLLM tokenizer path used by API Server request preprocessing.
+这个仓库聚焦的是 `vLLM API Server Tokenizer` 在超长输入下的 CPU 瓶颈。
 
-Native path of interest:
+我们关注的原生链路是：
 
 ```text
 OpenAIServingTokenization.create_tokenize
@@ -17,110 +16,102 @@ OpenAIServingTokenization.create_tokenize
   -> AsyncMicrobatchTokenizer.encode
 ```
 
-LoPT v1 path:
+LoPT 主思路是：
 
-- split long text into overlapped chunks
-- tokenize chunks in parallel worker processes
-- merge chunk token IDs using overlap-aware dedup based on offsets
+```text
+长文本
+  -> 切成带 overlap 的多个 chunk
+  -> 多个 worker process 并行 encode
+  -> 回收 chunk token ids + offsets
+  -> overlap 去重
+  -> 合并成最终 token ids
+```
 
-## 2. Constraints
+当前默认主线版本是 `v2.1`：
 
-- vLLM source of truth: `/home/light/vllm`
-- Do not start remote `vllm serve`
-- Do not modify remote machine dependencies / packages
-- Benchmark should reuse the native vLLM tokenizer path above
-- CPU affinity used in the main benchmark:
-  `29-31,40-79,155-159`
+- 保持与原生链路 `exact match`
+- 保留 LoPT 的多进程并行主骨架
+- 增加 submit / collect / worker encode / materialize / dedup 细粒度打点
 
-## 3. Current Status
+## 2. 先理解哪些目录
 
-Completed benchmark artifacts already exist locally.
+### 代码
 
-Important result sets:
+- `src/`
+  原始 LightTokenizer v1 时代代码，保留作为历史实现
+- `benchmarks/`
+  当前主线代码，包括搜索、回放、对比和报告生成
+- `benchmarks/lopt_v2/`
+  v2.1 模块化实现
 
-- DeepSeek full search:
-  `results/search_full_20260526/`
-- Qwen full search:
-  `results/search_qwen_full_20260526/`
-- merged search:
-  `results/search_merged_20260526/`
-- final replay:
-  `results/replay_merged_20260526/`
+### 文档
 
-Current report:
+- `README.md`
+- `docs/project_status.md`
+- `docs/optimization_journal.md`
+- `docs/architecture.md`
+- `docs/vllm_tokenizer_flow.md`
+- `../index.html`
 
-- [../index.html](../index.html)
+### 结果
 
-Environment snapshot:
+- `results/search_merged_v2_1_20260528/`
+- `results/replay_merged_v2_1_20260528/`
+- `results/replay_merged_20260526/`
+- `results/benchmark_env_info.json`
 
-- [../results/benchmark_env_info.json](../results/benchmark_env_info.json)
+## 3. 约束条件
 
-## 4. Where To Look First
+- vLLM 本地最新源码：`/home/light/vllm`
+- 不启动远端 `vllm serve`
+- 不修改远端服务器的依赖和包
+- benchmark 需要复用原生 vLLM tokenizer 路径
+- 主实验绑核范围：`29-31,40-79,155-159`
 
-If you want to understand the system:
+## 4. 当前最重要的文件
 
-1. [project_status.md](project_status.md)
-2. [architecture.md](architecture.md)
-3. [vllm_tokenizer_flow.md](vllm_tokenizer_flow.md)
-4. [benchmark_methodology.md](benchmark_methodology.md)
+- 报告模板：
+  `docs/index_v1_template.html`
+- 当前报告：
+  `../index.html`
+- 生成当前根目录主报告的脚本：
+  `benchmarks/generate_html_report.py`
 
-If you want to reproduce or extend:
+## 5. 如果只想快速验证几组 case
 
-1. [repro_commands.md](repro_commands.md)
-2. [results_guide.md](results_guide.md)
+优先用：
 
-## 5. Main Scripts
+- `python3 -m benchmarks.replay_best_configs`
 
-- `benchmarks/search_lopt_configs.py`
-  full configuration search
-- `benchmarks/postprocess_search_results.py`
-  merge / rank search outputs
-- `benchmarks/replay_best_configs.py`
-  replay best configs for final measurements
-- `benchmarks/generate_html_report.py`
-  generate the final HTML report
-- `benchmarks/collect_env_info.py`
-  capture benchmark host environment
-- `benchmarks/vllm_tokenizer_bench.py`
-  native baseline harness
-- `benchmarks/lopt_tokenizer.py`
-  LoPT v1 implementation
-
-## 6. Fast Path: Run A Few Cases
-
-Use `replay_best_configs.py` with filters to validate a subset:
-
-- by model family
-- by language
-- by length
-
-The script now supports:
+建议带过滤条件：
 
 - `--families`
 - `--languages`
 - `--lengths`
 
-This is the safest way to do spot checks without rerunning full search.
+这样可以只复跑少量最佳配置，而不是重跑完整 search。
 
-## 7. Full Search Path
+## 6. 如果要完整复现
 
-To rerun full search, the flow is:
+标准流程：
 
-1. prepare corpora
-2. run `search_lopt_configs.py`
-3. run `postprocess_search_results.py`
-4. run `replay_best_configs.py`
-5. run `collect_env_info.py`
-6. run `generate_html_report.py`
+1. 准备真实中英文语料
+2. 运行 `search_lopt_configs.py`
+3. 运行 `postprocess_search_results.py`
+4. 运行 `replay_best_configs.py`
+5. 运行 `collect_env_info.py`
+6. 运行 `generate_html_report.py` 生成根目录报告
 
-See [repro_commands.md](repro_commands.md) for exact commands.
+具体命令看：
 
-## 8. Precision Standard
+- [repro_commands.md](repro_commands.md)
 
-The optimization is only acceptable if:
+## 7. 精度标准
 
-- token count matches
-- token IDs match exactly
-- token hash matches exactly
+所有优化都必须满足：
 
-For quick reruns, timing may vary slightly, but exact-match correctness must not.
+- token 数量一致
+- token IDs 完全一致
+- token hash 一致
+
+性能允许有自然波动，但精度不能退。

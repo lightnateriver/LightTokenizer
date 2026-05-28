@@ -12,7 +12,14 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from benchmarks.lopt_tokenizer import LoPTConfig, LoPTParallelTokenizer
+from benchmarks.lopt_tokenizer import (
+    LoPTConfig as LoPTV1Config,
+    LoPTParallelTokenizer as LoPTV1ParallelTokenizer,
+)
+from benchmarks.lopt_tokenizer_v2 import (
+    LoPTConfig as LoPTV2Config,
+    LoPTParallelTokenizer as LoPTV2ParallelTokenizer,
+)
 from benchmarks.real_web_corpus import ensure_corpora
 from benchmarks.vllm_tokenizer_bench import (
     NativeBenchmarkHarness,
@@ -32,6 +39,7 @@ class TokenizerFamily:
 
 
 VALID_FAMILIES = ("DeepSeek-V4-Pro", "Qwen3.5")
+VALID_LOPT_VERSIONS = ("v1", "v2")
 
 
 def parse_int_list(text: str) -> list[int]:
@@ -149,6 +157,37 @@ def build_markdown(best_records: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def create_lopt_tokenizer(
+    *,
+    lopt_version: str,
+    tokenizer_path: Path,
+    worker_processes: int,
+    overlap_chars: int,
+    min_match_tokens: int,
+    record_boundary_diagnostics: bool,
+) -> Any:
+    if lopt_version == "v2":
+        return LoPTV2ParallelTokenizer(
+            LoPTV2Config(
+                tokenizer_path=str(tokenizer_path),
+                processes=worker_processes,
+                overlap_chars=overlap_chars,
+                min_match_tokens=min_match_tokens,
+                max_retry_rounds=0,
+                record_boundary_diagnostics=record_boundary_diagnostics,
+            )
+        )
+    return LoPTV1ParallelTokenizer(
+        LoPTV1Config(
+            tokenizer_path=str(tokenizer_path),
+            processes=worker_processes,
+            overlap_chars=overlap_chars,
+            min_match_tokens=min_match_tokens,
+            max_retry_rounds=0,
+        )
+    )
+
+
 async def measure_native_case(
     native: NativeBenchmarkHarness,
     text: str,
@@ -178,12 +217,13 @@ def evaluate_lopt_candidate(
     native: NativeBenchmarkHarness,
     native_summary: dict[str, Any],
     native_token_ids: list[int],
-    lopt: LoPTParallelTokenizer,
+    lopt: Any,
     text: str,
     family: TokenizerFamily,
     language: str,
     length_label: str,
     input_chars: int,
+    lopt_version: str,
     worker_processes: int,
     chunk_count: int,
     overlap_chars: int,
@@ -195,6 +235,7 @@ def evaluate_lopt_candidate(
         "model_name": family.model_name,
         "tokenizer_path": str(family.tokenizer_path),
         "tokenizer_mode": family.tokenizer_mode,
+        "lopt_version": lopt_version,
         "language": language,
         "length_label": length_label,
         "input_chars": input_chars,
@@ -203,8 +244,14 @@ def evaluate_lopt_candidate(
         "chunk_chars": chunk_chars,
         "overlap_chars": overlap_chars,
         "chat_template_time_ms": 0.0,
+        "dispatch_submit_time_ms": None,
+        "dispatch_collect_time_ms": None,
         "mp_dispatch_process_collect_time_ms": None,
         "chunk_dedup_time_ms": None,
+        "worker_encode_time_ms_sum": None,
+        "worker_encode_time_ms_max": None,
+        "worker_materialize_time_ms_sum": None,
+        "worker_materialize_time_ms_max": None,
         "lopt_e2e_time_ms": None,
         "native_e2e_time_ms": native_summary["native_e2e_time_ms"],
         "native_tokenizer_time_ms": native_summary["native_tokenizer_time_ms"],
@@ -260,10 +307,50 @@ def evaluate_lopt_candidate(
         record.update(
             {
                 "chat_template_time_ms": chat_template_time_ms,
+                "dispatch_submit_time_ms": (
+                    round_ms(
+                        median(
+                            [run.dispatch_submit_time_s * 1000.0 for run in runs]
+                        )
+                    )
+                ),
+                "dispatch_collect_time_ms": (
+                    round_ms(
+                        median(
+                            [run.dispatch_collect_time_s * 1000.0 for run in runs]
+                        )
+                    )
+                ),
                 "mp_dispatch_process_collect_time_ms": (
                     mp_dispatch_process_collect_time_ms
                 ),
                 "chunk_dedup_time_ms": chunk_dedup_time_ms,
+                "worker_encode_time_ms_sum": round_ms(
+                    median(
+                        [run.worker_encode_time_s_sum * 1000.0 for run in runs]
+                    )
+                ),
+                "worker_encode_time_ms_max": round_ms(
+                    median(
+                        [run.worker_encode_time_s_max * 1000.0 for run in runs]
+                    )
+                ),
+                "worker_materialize_time_ms_sum": round_ms(
+                    median(
+                        [
+                            run.worker_materialize_time_s_sum * 1000.0
+                            for run in runs
+                        ]
+                    )
+                ),
+                "worker_materialize_time_ms_max": round_ms(
+                    median(
+                        [
+                            run.worker_materialize_time_s_max * 1000.0
+                            for run in runs
+                        ]
+                    )
+                ),
                 "lopt_e2e_time_ms": lopt_e2e_time_ms,
                 "lopt_output_tokens": len(token_ids),
                 "lopt_token_hash": lopt_token_hash,
@@ -392,6 +479,7 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
     detail_csv.unlink(missing_ok=True)
 
     meta = {
+        "lopt_version": args.lopt_version,
         "cpuset_policy": args.cpuset_note,
         "selected_families": [family.family_name for family in families],
         "languages": args.languages,
@@ -414,6 +502,7 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
     detail_fieldnames = [
         "tokenizer_family",
         "model_name",
+        "lopt_version",
         "language",
         "length_label",
         "input_chars",
@@ -422,8 +511,14 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
         "chunk_chars",
         "overlap_chars",
         "chat_template_time_ms",
+        "dispatch_submit_time_ms",
+        "dispatch_collect_time_ms",
         "mp_dispatch_process_collect_time_ms",
         "chunk_dedup_time_ms",
+        "worker_encode_time_ms_sum",
+        "worker_encode_time_ms_max",
+        "worker_materialize_time_ms_sum",
+        "worker_materialize_time_ms_max",
         "lopt_e2e_time_ms",
         "native_e2e_time_ms",
         "native_tokenizer_time_ms",
@@ -475,14 +570,15 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
 
                     for worker_processes in args.worker_values:
                         worker_best: dict[str, Any] | None = None
-                        lopt = LoPTParallelTokenizer(
-                            LoPTConfig(
-                                tokenizer_path=str(family.tokenizer_path),
-                                processes=worker_processes,
-                                overlap_chars=max(args.overlap_values),
-                                min_match_tokens=args.min_match_tokens,
-                                max_retry_rounds=0,
-                            )
+                        lopt = create_lopt_tokenizer(
+                            lopt_version=args.lopt_version,
+                            tokenizer_path=family.tokenizer_path,
+                            worker_processes=worker_processes,
+                            overlap_chars=max(args.overlap_values),
+                            min_match_tokens=args.min_match_tokens,
+                            record_boundary_diagnostics=(
+                                args.record_boundary_diagnostics
+                            ),
                         )
                         try:
                             warmup_chunk_count = max(1, min(worker_processes, 4))
@@ -523,6 +619,7 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
                                         language=language,
                                         length_label=length_label,
                                         input_chars=input_chars,
+                                        lopt_version=args.lopt_version,
                                         worker_processes=worker_processes,
                                         chunk_count=chunk_count,
                                         overlap_chars=overlap_chars,
@@ -700,6 +797,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--renderer-workers", type=int, default=4)
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--min-match-tokens", type=int, default=2)
+    parser.add_argument(
+        "--lopt-version",
+        default="v1",
+        choices=list(VALID_LOPT_VERSIONS),
+    )
+    parser.add_argument("--record-boundary-diagnostics", action="store_true")
     parser.add_argument("--cpuset-note", default="29-31,40-79,155-159")
     parser.add_argument(
         "--deepseek-model-name",

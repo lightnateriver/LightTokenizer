@@ -17,6 +17,10 @@ FAMILY_ORDER = {
     "DeepSeek-V4-Pro": 0,
     "Qwen3.5": 1,
 }
+VERSION_ORDER = {
+    "v1": 0,
+    "v2": 1,
+}
 LANGUAGE_ORDER = {
     "zh": 0,
     "en": 1,
@@ -124,6 +128,14 @@ def language_label(language: str) -> str:
 
 def family_language_label(family: str, language: str) -> str:
     return f"{family} / {language_label(language)}"
+
+
+def version_label(version: str) -> str:
+    return {"v1": "v1", "v2": "v2.1"}.get(version, version)
+
+
+def family_language_version_label(family: str, language: str, version: str) -> str:
+    return f"{family} / {language_label(language)} / {version_label(version)}"
 
 
 def status_label(status: str | None) -> str:
@@ -270,6 +282,7 @@ def load_env_info(path: Path | None) -> dict[str, Any]:
 def build_principle_text() -> list[str]:
     return [
         "LoPT v1 保留了论文的核心思想：先把长文本按字符切成带 overlap 的多个 chunk，再在多个进程中并行执行 tokenization，最后基于位置感知的 overlap 匹配把各 chunk 的 token IDs 合并，确保最终 token 序列与串行 tokenization 完全一致。",
+        "LoPT v2.1 继续保留 v1 的分块、并行和 overlap 去重主思路，但把父进程侧的调度与收集链路拆得更细，显式记录 submit / collect / child compute / return tail / receive lag 等阶段，便于把瓶颈定位到更细粒度。",
         "在本次 benchmark 实现里，每个 worker process 内部各自持有一个本地 HF fast tokenizer。父进程负责分发 chunk 文本、回收每个 chunk 的 token IDs 和 offset mappings，再利用全局字符位置去识别并删除重叠区域中的重复 token。",
         "相较论文版本，这一版工程实现不做在线 chunk-length retry。按照你的要求，候选配置一旦失败就直接回退到原始串行逻辑；而离线 search 则穷举 worker 数、chunk 数和 overlap 大小，以找到稳定且 exact-match 的配置。",
     ]
@@ -281,6 +294,7 @@ def build_native_bottleneck_points() -> list[str]:
         "vLLM 原生链路虽然已经使用了 AsyncMicrobatchTokenizer 和共享线程池，但单个超长 prompt 本质上仍然对应一次底层 tokenizer 调用。线程池提升的是请求间并发能力，而不是单请求内部 1M 级长文本的切分并行。",
         "当长上下文模型、Prefill 高 Cache 命中率以及 PD 分离共同降低了后续推理阶段压力后，CPU 侧 Tokenizer 就会成为单请求的主要串行热点。",
         "在 1M 级输入下，哪怕 overlap 去重或 merge 只增加少量额外 CPU 开销，都可能抵消并行收益，所以优化必须同时满足两点：显著降低 tokenization 主耗时，并且把 merge 开销控制在较低水平，同时保证精度完全一致。",
+        "v1 已经证明了多进程切分 + overlap 去重这条路是可行的；v2.1 进一步把主耗时拆成 dispatch / child compute / collect tail / dedup 四个可观察阶段，用于继续找真正的瓶颈所在。",
     ]
 
 
@@ -289,7 +303,7 @@ def build_background_points() -> list[str]:
         "场景：Agent 应用向 vLLM 推理服务发送超长 prompt 请求。",
         "当前系统背景：Tokenizer 异步线程池已经启用；主流大模型普遍支持最高 1M 上下文；Prefill 阶段假设具有很高的 Cache 命中率；PD 分离后推理侧已经不再主导整体时延预算。",
         "核心痛点：Tokenizer 结果不可缓存，每个请求都必须重新计算；当输入文本达到超长规模时，Tokenizer 延迟会成为新的 CPU 瓶颈。",
-        "本次 benchmark 的目标：在完全一致的模型、真实语料与精度校验条件下，对比 vLLM 原生 Tokenizer 链路与 LoPT 风格多进程并行实现的性能差异。",
+        "本次 benchmark 的目标：在完全一致的模型、真实语料与精度校验条件下，对比 vLLM 原生 Tokenizer 链路与 LoPT v1 / v2.1 风格多进程并行实现的性能差异。",
     ]
 
 
@@ -303,7 +317,13 @@ def render_metric_legend() -> str:
         [r"<code>t_native_e2e</code>", "原生 E2E 耗时 (ms)", "从请求进入到原生 token IDs 返回的完整端到端耗时。"],
         [r"<code>t_native_tok</code>", "原生 Tokenizer 纯耗时 (ms)", "进入 <code>AsyncMicrobatchTokenizer.encode</code> 后到返回结果的耗时。"],
         [r"<code>t_chat</code>", "chat template 耗时 (ms)", "LoPT 分发前的模板处理耗时；本次 completion-style benchmark 中为 0.0 ms。"],
+        [r"<code>t_submit</code>", "dispatch submit 耗时 (ms)", "父进程把 chunk 提交到进程池所花的时间。"],
+        [r"<code>t_collect</code>", "dispatch collect 耗时 (ms)", "父进程等待并收集所有 worker 返回值所花的时间。"],
         [r"<code>t_lopt_mp</code>", "LoPT 多进程分发/处理/回收耗时 (ms)", "父进程分发 chunk 到所有 worker process 并回收结果的总耗时。"],
+        [r"<code>t_worker_encode_sum</code>", "worker encode 总时长 (ms)", "所有 worker 子进程 encode 时间的求和。"],
+        [r"<code>t_worker_encode_max</code>", "worker encode 最大时长 (ms)", "最慢 chunk 的 encode 时间上界。"],
+        [r"<code>t_worker_mat_sum</code>", "worker materialize 总时长 (ms)", "所有 worker 对 input_ids / offsets 物化的总时间。"],
+        [r"<code>t_worker_mat_max</code>", "worker materialize 最大时长 (ms)", "最慢 chunk 的物化时间上界。"],
         [r"<code>t_dedup</code>", "chunk 去重耗时 (ms)", "父进程对 overlap 区域执行匹配和去冗余的耗时。"],
         [r"<code>t_lopt_e2e</code>", "LoPT E2E 耗时 (ms)", r"<code>t_chat + t_lopt_mp + t_dedup</code>。"],
         [r"<code>S_e2e</code>", "E2E 加速比 (x)", r"<code>t_native_e2e / t_lopt_e2e</code>。"],
@@ -365,6 +385,73 @@ def case_title(record: dict[str, Any]) -> str:
         f"{record['tokenizer_family']} / {record['language'].upper()} / "
         f"{record['length_label']} ({fmt_int(record['input_chars'])} chars)"
     )
+
+
+def summarize_replay_records(replay_records: list[dict[str, Any]]) -> dict[str, Any]:
+    if not replay_records:
+        return {}
+    avg_native = sum(float(r["native_e2e_time_ms"]) for r in replay_records) / len(replay_records)
+    avg_lopt = sum(float(r["lopt_e2e_time_ms"]) for r in replay_records) / len(replay_records)
+    avg_speedup = sum(float(r["e2e_speedup_x"]) for r in replay_records) / len(replay_records)
+    max_speedup = max(replay_records, key=lambda r: float(r["e2e_speedup_x"]))
+    min_speedup = min(replay_records, key=lambda r: float(r["e2e_speedup_x"]))
+    exact_count = sum(bool(r.get("exact_match")) for r in replay_records)
+    return {
+        "case_count": len(replay_records),
+        "avg_native": avg_native,
+        "avg_lopt": avg_lopt,
+        "avg_speedup": avg_speedup,
+        "exact_count": exact_count,
+        "max_speedup": max_speedup,
+        "min_speedup": min_speedup,
+    }
+
+
+def compare_replay_records(
+    v1_records: list[dict[str, Any]],
+    v2_records: list[dict[str, Any]],
+) -> dict[str, Any]:
+    v1_by_key = {
+        (r["tokenizer_family"], r["language"], r["length_label"]): r
+        for r in v1_records
+    }
+    rows = []
+    for r2 in v2_records:
+        key = (r2["tokenizer_family"], r2["language"], r2["length_label"])
+        r1 = v1_by_key.get(key)
+        if not r1:
+            continue
+        rows.append(
+            {
+                "tokenizer_family": r2["tokenizer_family"],
+                "language": r2["language"],
+                "length_label": r2["length_label"],
+                "input_chars": int(r2["input_chars"]),
+                "v1_e2e": float(r1["lopt_e2e_time_ms"]),
+                "v2_e2e": float(r2["lopt_e2e_time_ms"]),
+                "speedup_x": float(r1["lopt_e2e_time_ms"]) / float(r2["lopt_e2e_time_ms"]),
+                "delta_ms": float(r1["lopt_e2e_time_ms"]) - float(r2["lopt_e2e_time_ms"]),
+                "v1_exact": bool(r1.get("exact_match")),
+                "v2_exact": bool(r2.get("exact_match")),
+                "v1_worker_processes": int(r1["worker_processes"]),
+                "v2_worker_processes": int(r2["worker_processes"]),
+                "v1_chunk_count": int(r1["chunk_count"]),
+                "v2_chunk_count": int(r2["chunk_count"]),
+                "v1_overlap": int(r1["overlap_chars"]),
+                "v2_overlap": int(r2["overlap_chars"]),
+            }
+        )
+    return {
+        "rows": rows,
+        "avg_speedup": (
+            sum(row["speedup_x"] for row in rows) / len(rows) if rows else None
+        ),
+        "avg_delta_ms": (
+            sum(row["delta_ms"] for row in rows) / len(rows) if rows else None
+        ),
+        "best_row": max(rows, key=lambda row: row["speedup_x"]) if rows else None,
+        "worst_row": min(rows, key=lambda row: row["speedup_x"]) if rows else None,
+    }
 
 
 def render_best_overview(replay_records: list[dict[str, Any]]) -> str:
@@ -570,6 +657,8 @@ def render_svg_dual_line_chart(
     secondary_metric_key: str,
     chart_title: str,
     y_label: str,
+    primary_label: str = "LoPT E2E",
+    secondary_label: str = "原生 E2E",
 ) -> str:
     if not replay_records:
         return ""
@@ -680,8 +769,8 @@ def render_svg_dual_line_chart(
 
     metric_legend = "".join(
         [
-            '<div class="chart-legend-item"><span class="chart-line solid"></span>LoPT E2E</div>',
-            '<div class="chart-legend-item"><span class="chart-line dashed"></span>原生 E2E</div>',
+            f'<div class="chart-legend-item"><span class="chart-line solid"></span>{escape(primary_label)}</div>',
+            f'<div class="chart-legend-item"><span class="chart-line dashed"></span>{escape(secondary_label)}</div>',
         ]
     )
 
@@ -805,7 +894,15 @@ def render_svg_stacked_bar_chart(replay_records: list[dict[str, Any]]) -> str:
     """
 
 
-def render_svg_dual_bar_chart(replay_records: list[dict[str, Any]]) -> str:
+def render_svg_dual_bar_chart(
+    replay_records: list[dict[str, Any]],
+    primary_metric_key: str = "native_e2e_time_ms",
+    secondary_metric_key: str = "lopt_e2e_time_ms",
+    primary_label: str = "原生 E2E",
+    secondary_label: str = "LoPT E2E",
+    chart_title: str = "原生 E2E 与 LoPT E2E 对比柱状图",
+    chart_subtitle: str = "同一最优配置下，直接对比优化前后总耗时",
+) -> str:
     if not replay_records:
         return ""
 
@@ -829,7 +926,7 @@ def render_svg_dual_bar_chart(replay_records: list[dict[str, Any]]) -> str:
     bar_width = max(8, min(18, pair_gap * 0.28))
     inner_gap = max(4, bar_width * 0.45)
     max_value = max(
-        max(float(record["native_e2e_time_ms"]), float(record["lopt_e2e_time_ms"]))
+        max(float(record[primary_metric_key]), float(record[secondary_metric_key]))
         for record in records
     )
     if max_value <= 0:
@@ -843,14 +940,14 @@ def render_svg_dual_bar_chart(replay_records: list[dict[str, Any]]) -> str:
     labels = []
     for idx, record in enumerate(records):
         center_x = margin_left + idx * pair_gap + pair_gap / 2
-        native_h = bar_height(float(record["native_e2e_time_ms"]))
-        lopt_h = bar_height(float(record["lopt_e2e_time_ms"]))
+        native_h = bar_height(float(record[primary_metric_key]))
+        lopt_h = bar_height(float(record[secondary_metric_key]))
         base_y = margin_top + plot_height
         native_x = center_x - inner_gap / 2 - bar_width
         lopt_x = center_x + inner_gap / 2
         bars.append(
-            f'<rect x="{native_x:.2f}" y="{base_y - native_h:.2f}" width="{bar_width:.2f}" height="{native_h:.2f}" fill="{BREAKDOWN_COLORS["native"]}"><title>Native E2E={record["native_e2e_time_ms"]} ms</title></rect>'
-            f'<rect x="{lopt_x:.2f}" y="{base_y - lopt_h:.2f}" width="{bar_width:.2f}" height="{lopt_h:.2f}" fill="{BREAKDOWN_COLORS["lopt"]}"><title>LoPT E2E={record["lopt_e2e_time_ms"]} ms</title></rect>'
+            f'<rect x="{native_x:.2f}" y="{base_y - native_h:.2f}" width="{bar_width:.2f}" height="{native_h:.2f}" fill="{BREAKDOWN_COLORS["native"]}"><title>{escape(primary_label)}={record[primary_metric_key]} ms</title></rect>'
+            f'<rect x="{lopt_x:.2f}" y="{base_y - lopt_h:.2f}" width="{bar_width:.2f}" height="{lopt_h:.2f}" fill="{BREAKDOWN_COLORS["lopt"]}"><title>{escape(secondary_label)}={record[secondary_metric_key]} ms</title></rect>'
         )
         labels.append(
             f'<text x="{center_x:.2f}" y="{height - 52}" text-anchor="end" font-size="10" fill="#5f7286" transform="rotate(-55 {center_x:.2f} {height - 52})">{escape(record["tokenizer_family"].replace("DeepSeek-V4-Pro", "DSV4-Pro"))}/{escape(record["language"].upper())}/{escape(record["length_label"])}</text>'
@@ -869,8 +966,8 @@ def render_svg_dual_bar_chart(replay_records: list[dict[str, Any]]) -> str:
     legend_html = "".join(
         f'<div class="chart-legend-item"><span class="chart-swatch" style="background:{color}"></span>{label}</div>'
         for label, color in [
-            ("原生 E2E", BREAKDOWN_COLORS["native"]),
-            ("LoPT E2E", BREAKDOWN_COLORS["lopt"]),
+            (primary_label, BREAKDOWN_COLORS["native"]),
+            (secondary_label, BREAKDOWN_COLORS["lopt"]),
         ]
     )
 
@@ -878,8 +975,8 @@ def render_svg_dual_bar_chart(replay_records: list[dict[str, Any]]) -> str:
     <div class="chart-card">
       <div class="chart-head">
         <div>
-          <div class="chart-title">原生 E2E 与 LoPT E2E 对比柱状图</div>
-          <div class="chart-subtitle">同一最优配置下，直接对比优化前后总耗时</div>
+          <div class="chart-title">{escape(chart_title)}</div>
+          <div class="chart-subtitle">{escape(chart_subtitle)}</div>
         </div>
         <div class="chart-legend">{legend_html}</div>
       </div>
@@ -1148,7 +1245,7 @@ def render_best_case_summary(replay_records: list[dict[str, Any]]) -> str:
     return f"""
     <section class="section" id="best-case-analysis">
       <div class="section-head">
-        <h2>06 · 最佳配置综合对比</h2>
+        <h2>08 · 最佳配置综合对比</h2>
         <p>基于 final replay 的 48 个最优 case，集中展示不同模型 / 中英文 / 不同输入长度下的最佳配置、性能提升、耗时拆分与精度情况。</p>
       </div>
       <div class="chip-row">{''.join(f'<span class="chip">{escape(item)}</span>' for item in chips)}</div>
@@ -1172,6 +1269,91 @@ def render_best_case_summary(replay_records: list[dict[str, Any]]) -> str:
         <summary>最优 replay case 综合表</summary>
         <div class="body">
           <p class="table-note">该表直接展示每个最终最优配置下的原生耗时、LoPT 分段耗时、总加速比和精度结果，适合做横向汇报与复核。</p>
+          {render_table(headers, rows, class_name="dense-table")}
+        </div>
+      </details>
+    </section>
+    """
+
+
+def render_version_comparison(ctx: dict[str, Any]) -> str:
+    comparison = ctx.get("comparison") or {}
+    rows = []
+    for row in comparison.get("rows", []):
+        rows.append(
+            [
+                escape(row["tokenizer_family"]),
+                escape(language_label(row["language"])),
+                escape(row["length_label"]),
+                fmt_ms(row["v1_e2e"]),
+                fmt_ms(row["v2_e2e"]),
+                fmt_x(row["speedup_x"]),
+                fmt_ms(row["delta_ms"]),
+                "Exact" if row["v1_exact"] and row["v2_exact"] else "Mismatch",
+                f"p={fmt_int(row['v1_worker_processes'])}→{fmt_int(row['v2_worker_processes'])}",
+                f"k={fmt_int(row['v1_chunk_count'])}→{fmt_int(row['v2_chunk_count'])}",
+                f"o={fmt_int(row['v1_overlap'])}→{fmt_int(row['v2_overlap'])}",
+            ]
+        )
+    headers = [
+        "模型",
+        "语言",
+        "长度",
+        "v1 E2E (ms)",
+        "v2.1 E2E (ms)",
+        "加速比 (x)",
+        "节省 (ms)",
+        "精度",
+        "p 变化",
+        "k 变化",
+        "o 变化",
+    ]
+    best_row = comparison.get("best_row")
+    worst_row = comparison.get("worst_row")
+    chips = []
+    if comparison.get("avg_speedup") is not None:
+        chips.append(f"48 case 平均提速: {fmt_x(comparison['avg_speedup'])}")
+    if comparison.get("avg_delta_ms") is not None:
+        chips.append(f"平均节省: {fmt_ms(comparison['avg_delta_ms'])} ms")
+    if best_row:
+        chips.append(
+            f"最佳 case: {best_row['tokenizer_family']} / {language_label(best_row['language'])} / {best_row['length_label']} ({fmt_x(best_row['speedup_x'])})"
+        )
+    if worst_row:
+        chips.append(
+            f"最弱 case: {worst_row['tokenizer_family']} / {language_label(worst_row['language'])} / {worst_row['length_label']} ({fmt_x(worst_row['speedup_x'])})"
+        )
+    compare_chart = render_svg_dual_line_chart(
+        comparison.get("rows", []),
+        "v2_e2e",
+        "v1_e2e",
+        "v2.1 vs v1 E2E 曲线",
+        "E2E 耗时 (ms)",
+        primary_label="v2.1 E2E",
+        secondary_label="v1 E2E",
+    )
+    compare_speedup_chart = render_svg_line_chart(
+        comparison.get("rows", []),
+        "speedup_x",
+        "v2.1 相对 v1 加速比曲线",
+        "E2E 加速比 (x)",
+        "x",
+    )
+    return f"""
+    <section class="section" id="version-compare">
+      <div class="section-head">
+        <h2>07 · v1 / v2.1 版本对比</h2>
+        <p>把同一组 best case 的 v1 与 v2.1 最终 replay 结果并排对照，直观看出新版在哪些长度和语言上更快，以及参数形态是否发生变化。</p>
+      </div>
+      <div class="chip-row">{''.join(f'<span class="chip">{escape(item)}</span>' for item in chips)}</div>
+      <div class="chart-grid">
+        {compare_chart}
+        {compare_speedup_chart}
+      </div>
+      <details class="fold" open>
+        <summary>v1 vs v2.1 对照表</summary>
+        <div class="body">
+          <p class="table-note">该表按相同模型 / 语言 / 输入长度对齐 v1 和 v2.1 最优配置，展示最终 E2E 变化与参数变化。</p>
           {render_table(headers, rows, class_name="dense-table")}
         </div>
       </details>
@@ -1529,6 +1711,101 @@ def render_full_data_explorer(
     """
 
 
+def render_v2_artifacts(ctx: dict[str, Any]) -> str:
+    v2_summary = summarize_replay_records(ctx["replay_records"])
+    best = v2_summary.get("max_speedup")
+    worst = v2_summary.get("min_speedup")
+    chips = [
+        f"case 数: {fmt_int(v2_summary.get('case_count'))}",
+        f"平均原生 E2E: {fmt_ms(v2_summary.get('avg_native'))}",
+        f"平均 LoPT E2E: {fmt_ms(v2_summary.get('avg_lopt'))}",
+        f"平均加速比: {fmt_x(v2_summary.get('avg_speedup'))}",
+        f"Exact Match: {fmt_int(v2_summary.get('exact_count'))}/{fmt_int(v2_summary.get('case_count'))}",
+    ]
+    if best:
+        chips.append(
+            f"最佳 case: {best['tokenizer_family']} / {language_label(best['language'])} / {best['length_label']} ({fmt_x(best['e2e_speedup_x'])})"
+        )
+    if worst:
+        chips.append(
+            f"最弱 case: {worst['tokenizer_family']} / {language_label(worst['language'])} / {worst['length_label']} ({fmt_x(worst['e2e_speedup_x'])})"
+        )
+    rows = []
+    for record in ctx["replay_records"]:
+        rows.append(
+            [
+                escape(record["tokenizer_family"]),
+                escape(language_label(record["language"])),
+                escape(record["length_label"]),
+                fmt_int(record["worker_processes"]),
+                fmt_int(record["chunk_count"]),
+                fmt_int(record["overlap_chars"]),
+                fmt_ms(record.get("dispatch_submit_time_ms")),
+                fmt_ms(record.get("dispatch_collect_time_ms")),
+                fmt_ms(record.get("worker_encode_time_ms_sum")),
+                fmt_ms(record.get("worker_encode_time_ms_max")),
+                fmt_ms(record.get("worker_materialize_time_ms_sum")),
+                fmt_ms(record.get("worker_materialize_time_ms_max")),
+                fmt_ms(record["native_e2e_time_ms"]),
+                fmt_ms(record["native_tokenizer_time_ms"]),
+                fmt_ms(record["chat_template_time_ms"]),
+                fmt_ms(record["mp_dispatch_process_collect_time_ms"]),
+                fmt_ms(record["chunk_dedup_time_ms"]),
+                fmt_ms(record["lopt_e2e_time_ms"]),
+                fmt_x(record["e2e_speedup_x"]),
+                fmt_x(record["tokenizer_speedup_x"]),
+                fmt_pct(record["tokenizer_time_drop_pct"]),
+                "Exact Match" if record["exact_match"] else "Mismatch",
+            ]
+        )
+    return f"""
+    <section class="section" id="v2-summary">
+      <div class="section-head">
+        <h2>06 · v2.1 版本摘要</h2>
+        <p>单独补充 v2.1 的完整结果和最优参数，便于和 v1 的旧版报告做直接比较。</p>
+      </div>
+      <div class="chip-row">{''.join(f'<span class="chip">{escape(item)}</span>' for item in chips)}</div>
+      <div class="chart-grid">
+        {render_svg_dual_line_chart(ctx["replay_records"], "lopt_e2e_time_ms", "native_e2e_time_ms", "v2.1 最优配置原生 vs LoPT E2E 曲线", "原生 E2E 与 LoPT E2E (ms)")}
+        {render_svg_line_chart(ctx["replay_records"], "e2e_speedup_x", "v2.1 最优配置 E2E 加速比曲线", "E2E 加速比 (x)", "x")}
+      </div>
+      <details class="fold" open>
+        <summary>v2.1 最优配置总表</summary>
+        <div class="body">
+          {render_table(
+              [
+                  "模型",
+                  "语言",
+                  "长度",
+                  "p (proc)",
+                  "k (count)",
+                  "o (chars)",
+                  "t_submit (ms)",
+                  "t_collect (ms)",
+                  "worker_encode_sum (ms)",
+                  "worker_encode_max (ms)",
+                  "worker_mat_sum (ms)",
+                  "worker_mat_max (ms)",
+                  "原生 E2E (ms)",
+                  "原生 Tokenizer (ms)",
+                  "LoPT t_chat (ms)",
+                  "LoPT t_lopt_mp (ms)",
+                  "LoPT t_dedup (ms)",
+                  "LoPT E2E (ms)",
+                  "E2E 加速比 (x)",
+                  "Tokenizer 加速比 (x)",
+                  "Tokenizer 降幅 (%)",
+                  "精度",
+              ],
+              rows,
+              class_name="dense-table",
+          )}
+        </div>
+      </details>
+    </section>
+    """
+
+
 def render_callout(title: str, points: list[str], kind: str = "info") -> str:
     items = "".join(f"<li>{escape(point)}</li>" for point in points)
     return f"""
@@ -1572,6 +1849,24 @@ def build_report_context(args: argparse.Namespace) -> dict[str, Any]:
             int(record["input_chars"]),
         ),
     )
+    v1_best_path = getattr(args, "v1_best_json", None)
+    v1_replay_path = getattr(args, "v1_replay_json", None)
+    v1_best_records = sorted(
+        load_json(v1_best_path),
+        key=lambda record: (
+            FAMILY_ORDER.get(record["tokenizer_family"], 99),
+            LANGUAGE_ORDER.get(record["language"], 99),
+            int(record["input_chars"]),
+        ),
+    ) if v1_best_path and Path(v1_best_path).exists() else []
+    v1_replay_records = sorted(
+        load_json(v1_replay_path),
+        key=lambda record: (
+            FAMILY_ORDER.get(record["tokenizer_family"], 99),
+            LANGUAGE_ORDER.get(record["language"], 99),
+            int(record["input_chars"]),
+        ),
+    ) if v1_replay_path and Path(v1_replay_path).exists() else []
     replay_records = sorted(
         load_json(args.replay_json),
         key=lambda record: (
@@ -1586,6 +1881,7 @@ def build_report_context(args: argparse.Namespace) -> dict[str, Any]:
 
     best_by_case = {record_case_key(record): record for record in best_records}
     replay_by_case = {record_case_key(record): record for record in replay_records}
+    v1_replay_by_case = {record_case_key(record): record for record in v1_replay_records}
 
     candidate_counter = len(detail_records)
     fallback_count = sum(bool(record.get("fallback_used")) for record in detail_records)
@@ -1602,6 +1898,7 @@ def build_report_context(args: argparse.Namespace) -> dict[str, Any]:
         replay_records,
         key=lambda record: float(record["tokenizer_time_drop_pct"]),
     )
+    comparison = compare_replay_records(v1_replay_records, replay_records)
 
     return {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -1612,8 +1909,12 @@ def build_report_context(args: argparse.Namespace) -> dict[str, Any]:
         "worker_best_records": worker_best_records,
         "best_records": best_records,
         "best_by_case": best_by_case,
+        "v1_best_records": v1_best_records,
+        "v1_replay_records": v1_replay_records,
+        "v1_replay_by_case": v1_replay_by_case,
         "replay_records": replay_records,
         "replay_by_case": replay_by_case,
+        "comparison": comparison,
         "search_meta": search_meta,
         "corpus_sources": corpus_sources,
         "env_info": env_info,
@@ -1634,6 +1935,9 @@ def render_summary_cards(ctx: dict[str, Any], args: argparse.Namespace) -> str:
     best_e2e = ctx["max_e2e_record"]
     best_tok = ctx["max_tok_record"]
     best_drop = ctx["max_drop_record"]
+    comparison = ctx.get("comparison") or {}
+    avg_speedup = comparison.get("avg_speedup")
+    avg_delta_ms = comparison.get("avg_delta_ms")
     cards = [
         (
             "全局最佳 E2E 加速比",
@@ -1664,6 +1968,11 @@ def render_summary_cards(ctx: dict[str, Any], args: argparse.Namespace) -> str:
             "最终 replay case 数",
             fmt_int(case_count),
             "2 个模型族 · 2 种语言 · 12 个输入长度",
+        ),
+        (
+            "v2.1 对 v1 平均提速",
+            fmt_x(avg_speedup),
+            f"平均节省 {fmt_ms(avg_delta_ms)} ms / case",
         ),
     ]
     return "".join(
@@ -1763,33 +2072,6 @@ def render_source_file_list(source_files: list[str]) -> str:
 
 def render_html(args: argparse.Namespace, ctx: dict[str, Any]) -> str:
     native_ascii = ctx["ascii_flow"]
-    lopt_ascii = """
-User text prompt
-    |
-    v
-Completion-style benchmark input
-    |
-    +--> t_chat = 0.0 ms in this benchmark
-    |
-    v
-LoPT split(text, k chunks, overlap=o chars)
-    |
-    +--> Chunk[0] --------------+
-    +--> Chunk[1] --------------+--> ProcessPoolExecutor(p workers)
-    +--> ... -------------------+
-    +--> Chunk[k-1] ------------+
-                |
-                v
-      per-chunk token IDs + offsets
-                |
-                v
-   parent process position-aware overlap match
-                |
-                +--> remove duplicate overlap tokens
-                |
-                v
-         merged final token IDs
-    """.strip()
     native_bottleneck_ascii = "\n".join(
         [
             "单个超长 prompt",
@@ -1809,25 +2091,76 @@ LoPT split(text, k chunks, overlap=o chars)
             "但单个 1M prompt 内部没有被切分并行。",
         ]
     )
-    overlap_dedup_ascii = "\n".join(
-        [
-            "Chunk A token IDs + offsets          Chunk B token IDs + offsets",
-            "           |                                     |",
-            "           +------------------+------------------+",
-            "                              v",
-            "              父进程只在全局字符区间对齐时",
-            "              才比较两个 token",
-            "                              |",
-            "                              v",
-            "                  找到最长有效 overlap anchor",
-            "                              |",
-            "                              v",
-            "                 保留 A-left + overlap + B-right",
-            "",
-            "精度一致条件：",
-            "  token ID 相同 且 全局字符区间相同",
-        ]
-    )
+    lopt_v1_ascii = """
+User text prompt
+    |
+    v
+LoPT v1: split(text, k chunks, overlap=o chars)
+    |
+    +--> Chunk[0] --------------+
+    +--> Chunk[1] --------------+--> ProcessPoolExecutor(p workers)
+    +--> ... -------------------+
+    +--> Chunk[k-1] ------------+
+                |
+                v
+      per-chunk token IDs + offsets
+                |
+                v
+   parent overlap anchor match + dedup
+                |
+                v
+         merged final token IDs
+    """.strip()
+    lopt_v2_ascii = """
+User text prompt
+    |
+    v
+LoPT v2.1: split(text, k chunks, overlap=o chars)
+    |
+    +--> Chunk[0] --------------+
+    +--> Chunk[1] --------------+--> ProcessPoolExecutor(p workers)
+    +--> ... -------------------+
+    +--> Chunk[k-1] ------------+
+                |
+                v
+      per-chunk token IDs + offsets
+                |
+                v
+   parent dispatch/collect bookkeeping
+        |      |      |
+        |      |      +--> t_return_tail / t_lag_max
+        |      +--> t_collect_child
+        +--> t_lopt_mp
+                |
+                v
+   parent overlap anchor match + dedup
+                |
+                v
+         merged final token IDs
+    """.strip()
+    lopt_v2_diff_points = [
+        "v2.1 仍然保留 v1 的 split / parallel / overlap dedup 主骨架，不改变最终 token IDs 的 exact-match 目标。",
+        "v2.1 把父进程侧的调度与收集拆成可量化阶段，显式记录 submit / collect / child compute / return tail / receive lag。",
+        "v2.1 引入绝对字符偏移视角，便于定位边界 token 的对齐和去冗余问题。",
+        "v2.1 更适合做瓶颈诊断与持续优化；v1 更适合做已知最佳参数的稳定回放基线。",
+    ]
+    overlap_dedup_ascii = """
+Chunk A token IDs + offsets          Chunk B token IDs + offsets
+           |                                     |
+           +------------------+------------------+
+                              v
+              父进程只在全局字符区间对齐时
+              才比较两个 token
+                              |
+                              v
+                  找到最长有效 overlap anchor
+                              |
+                              v
+                 保留 A-left + overlap + B-right
+
+精度一致条件：
+  token ID 相同 且 全局字符区间相同
+    """.strip()
 
     principle_paragraphs = "".join(
         f"<p>{escape(paragraph)}</p>" for paragraph in build_principle_text()
@@ -1838,6 +2171,8 @@ LoPT split(text, k chunks, overlap=o chars)
     report_subtitle = escape(args.report_subtitle)
     source_files_html = render_source_file_list(ctx["source_files"])
     best_case_summary_html = render_best_case_summary(ctx["replay_records"])
+    v2_artifacts_html = render_v2_artifacts(ctx)
+    version_comparison_html = render_version_comparison(ctx)
     best_overview_html = render_best_overview(ctx["replay_records"])
     worker_best_html = render_worker_best(ctx["worker_best_records"])
     candidate_detail_html = render_candidate_details(
@@ -2595,6 +2930,8 @@ LoPT split(text, k chunks, overlap=o chars)
       <a href="#lopt">LoPT</a>
       <a href="#setup">实验设置</a>
       <a href="#legend">指标说明</a>
+      <a href="#v2-summary">v2.1 摘要</a>
+      <a href="#version-compare">v1/v2.1 对比</a>
       <a href="#best-case-analysis">最佳配置综合对比</a>
       <a href="#results">最终结果</a>
       <a href="#worker-best">Worker 最优</a>
@@ -2639,12 +2976,33 @@ LoPT split(text, k chunks, overlap=o chars)
     <section class="section" id="lopt">
       <div class="section-head">
         <h2>03 · LoPT 原理与数据链路</h2>
-        <p>按你的要求，同时用文字说明和 ASCII 数据链路图展示 LoPT 原理。</p>
+        <p>同时展示 v1 与 v2.1 的字符链路，并说明两版在调度、收集和诊断上的差异。</p>
       </div>
       {principle_paragraphs}
       <div class="diagram-grid">
-        {render_ascii_block("LoPT v1 多进程数据链路", lopt_ascii, accent="teal")}
+        {render_ascii_block("LoPT v1 多进程数据链路", lopt_v1_ascii, accent="teal")}
+        {render_ascii_block("LoPT v2.1 多进程数据链路", lopt_v2_ascii, accent="blue")}
+      </div>
+      {render_callout("v2.1 相对 v1 的差异", lopt_v2_diff_points, kind="ok")}
+      <div class="diagram-grid">
         {render_ascii_block("基于位置感知的 overlap 去重逻辑", overlap_dedup_ascii, accent="blue")}
+        {render_ascii_block("v2.1 额外可观测的细粒度阶段", """
+dispatch_submit
+    |
+    v
+collect_result_receive_lag
+    |
+    v
+collect_child_compute_makespan
+    |
+    v
+collect_result_return_tail
+    |
+    v
+chunk_dedup
+
+这些指标不改变主算法，只是把瓶颈拆得更细，方便后续针对性优化。
+        """.strip(), accent="teal")}
       </div>
       <details class="fold">
         <summary>LoPT v1 相对论文方案的工程实现说明</summary>
@@ -2675,11 +3033,17 @@ LoPT split(text, k chunks, overlap=o chars)
       {render_metric_legend()}
     </section>
 
+    {v2_artifacts_html}
+
+    <section class="section" id="v1-v2-compare">
+      {version_comparison_html}
+    </section>
+
     {best_case_summary_html}
 
     <section class="section" id="results">
       <div class="section-head">
-        <h2>07 · 最终最优结果</h2>
+        <h2>09 · 最终最优结果</h2>
         <p>Replay 表格展示了每个模型族、语言和输入长度下最终选定的最优配置。</p>
       </div>
       {best_overview_html}
@@ -2687,7 +3051,7 @@ LoPT split(text, k chunks, overlap=o chars)
 
     <section class="section" id="worker-best">
       <div class="section-head">
-        <h2>08 · Worker 维度最优配置</h2>
+        <h2>10 · Worker 维度最优配置</h2>
         <p>展示每个 worker process 数下的最优候选，再从中选择最终最优配置。</p>
       </div>
       {worker_best_html}
@@ -2695,7 +3059,7 @@ LoPT split(text, k chunks, overlap=o chars)
 
     <section class="section" id="search">
       <div class="section-head">
-        <h2>09 · 全量 Search 细节</h2>
+        <h2>11 · 全量 Search 细节</h2>
         <p>按模型族 → 语言 → 输入长度分层折叠展示完整候选配置表。</p>
       </div>
       {candidate_detail_html}
@@ -2705,7 +3069,7 @@ LoPT split(text, k chunks, overlap=o chars)
 
     <section class="section" id="sources">
       <div class="section-head">
-        <h2>11 · 真实网页语料来源</h2>
+        <h2>13 · 真实网页语料来源</h2>
         <p>纯中文和纯英文输入均来自真实公开网页的可见文本抽取结果。</p>
       </div>
       {source_panel_html}
@@ -2713,16 +3077,17 @@ LoPT split(text, k chunks, overlap=o chars)
 
     <section class="section" id="artifacts">
       <div class="section-head">
-        <h2>12 · 输出物路径</h2>
+        <h2>14 · 输出物路径</h2>
         <p>列出原始候选数据、合并结果、replay 结果以及当前 HTML 报告的落盘路径。</p>
       </div>
       {render_table(
           ["输出物", "路径"],
           [
-              ["Merged search detail JSONL", escape(str(args.search_detail_jsonl))],
-              ["Worker 最优 JSON", escape(str(args.worker_best_json))],
-              ["Final 最优 JSON", escape(str(args.best_json))],
-              ["Replay JSON", escape(str(args.replay_json))],
+              ["Merged v2.1 search detail JSONL", escape(str(args.search_detail_jsonl))],
+              ["Merged v2.1 worker-best JSON", escape(str(args.worker_best_json))],
+              ["Merged v2.1 best JSON", escape(str(args.best_json))],
+              ["v2.1 replay JSON", escape(str(args.replay_json))],
+              ["v1 replay JSON", escape(str(getattr(args, 'v1_replay_json', '-') or '-'))],
               ["链路分析 Markdown", escape(str(args.flow_doc))],
               ["HTML 报告", escape(str(args.output_html))],
           ],
@@ -3215,6 +3580,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--worker-best-json", type=Path, required=True)
     parser.add_argument("--best-json", type=Path, required=True)
     parser.add_argument("--replay-json", type=Path, required=True)
+    parser.add_argument("--v1-best-json", type=Path, default=None)
+    parser.add_argument("--v1-replay-json", type=Path, default=None)
     parser.add_argument("--flow-doc", type=Path, required=True)
     parser.add_argument("--output-html", type=Path, required=True)
     parser.add_argument("--vllm-src", type=Path, required=True)
