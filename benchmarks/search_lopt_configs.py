@@ -54,9 +54,12 @@ def candidate_chunk_counts(
     worker_processes: int,
     chunk_multipliers: list[float],
 ) -> list[int]:
-    counts = {1, max(1, worker_processes)}
+    counts = {max(1, worker_processes)}
     for multiplier in chunk_multipliers:
-        counts.add(max(1, int(round(worker_processes * multiplier))))
+        count = max(1, int(round(worker_processes * multiplier)))
+        if count < worker_processes:
+            continue
+        counts.add(count)
     return sorted(counts)
 
 
@@ -605,7 +608,11 @@ async def run_search(args: argparse.Namespace) -> dict[str, Any]:
                                     1,
                                     math.ceil(input_chars / chunk_count),
                                 )
-                                for overlap_chars in args.overlap_values:
+                                if chunk_count == 1:
+                                    overlap_iter = [min(256, max(1, chunk_chars - 1))]
+                                else:
+                                    overlap_iter = args.overlap_values
+                                for overlap_chars in overlap_iter:
                                     if overlap_chars >= chunk_chars:
                                         continue
 

@@ -179,6 +179,21 @@ def load_rows(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def normalize_row_for_constraints(row: dict[str, Any]) -> dict[str, Any] | None:
+    worker_processes = int(row["worker_processes"])
+    chunk_count = int(row["chunk_count"])
+    chunk_chars = int(row["chunk_chars"])
+    if chunk_count < worker_processes:
+        return None
+
+    normalized = dict(row)
+    if chunk_count == 1:
+        fixed_overlap = min(256, max(1, chunk_chars - 1))
+        if int(normalized["overlap_chars"]) != fixed_overlap:
+            normalized["overlap_chars"] = fixed_overlap
+    return normalized
+
+
 def write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for record in records:
@@ -226,8 +241,14 @@ def main() -> None:
             row.get("overlap_chars", 0),
         ),
     )
+    constrained_rows = []
+    for row in rows:
+        normalized = normalize_row_for_constraints(row)
+        if normalized is not None:
+            constrained_rows.append(normalized)
+
     valid_rows = [
-        row for row in rows
+        row for row in constrained_rows
         if row.get("candidate_status") == "valid" and not row.get("fallback_used")
     ]
 
@@ -284,8 +305,8 @@ def main() -> None:
     best_md = output_dir / "best_configs.md"
     failures_json = output_dir / "case_failures.json"
 
-    write_jsonl(detail_json, rows)
-    write_csv(detail_csv, DETAIL_FIELDNAMES, rows)
+    write_jsonl(detail_json, constrained_rows)
+    write_csv(detail_csv, DETAIL_FIELDNAMES, constrained_rows)
 
     worker_best_json.write_text(
         json.dumps(worker_best_records, ensure_ascii=False, indent=2),
@@ -306,7 +327,7 @@ def main() -> None:
     print(
         json.dumps(
             {
-                "detail_rows": len(rows),
+                "detail_rows": len(constrained_rows),
                 "valid_rows": len(valid_rows),
                 "input_dirs": [str(path) for path in input_dirs],
                 "detail_jsonl": str(detail_json),
